@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1>Blog Post</h1>
+<table>
+    <tr>
+        <th>Post:</th>
+        <td>{{ post['question'] }}</td>
+    </tr>
+    <tr>
+        <th>By:</th>
+        <td>{{ post['blogger'] }}</td>
+    </tr>
+</table>
+
+<div class="add_comment">
+    <h2>Add a Comment</h2>
+
+    <form action="{{ url_for('add_comment', blog_id=post['blog_id']) }}" method="POST">
+        <table>
+            <tr>
+                <th>User:</th>
+                <td>{{ users[session['user_id']] }}</td>
+            </tr>
+            <tr>
+                <th>Comment:</th>
+                <td><input type="text" name="comment"></td>
+            </tr>
+            <tr>
+                <th></th>
+                <td><p><input type="submit"></p></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<p>Comments</p>
+<table>
+    {% for comment in comments %}
+    <tr>
+        <th>User:</th>
+        <td>{{ users[comment['user_id']] }}</td>
+    </tr>
+    <tr>
+        <th>Comment:</th>
+        <td>{{ comment['comment'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+<p><a href="{{ url_for('posts') }}">Go back</a></p>
+
+<p><a href="{{ url_for('log_out')}}">Log Out</a></p>
+
+
+{% endblock %}

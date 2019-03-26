@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block body %}
+    <h1>Sign up to start posting</h1>
+    <form action="{{ url_for('sign_up_submit' )}}" method="POST">
+        <ul>
+            <li>
+                <input type="text" name="username" placeholder="Username">
+            </li>
+            <li>
+                <input type="password" name="password" placeholder="Password">
+            </li>
+            <li>
+                <input type="submit" value="Sign Up">
+            </li>
+        </ul>
+    </form>
+
+
+{% endblock %}
