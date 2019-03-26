@@ -1,57 +1,58 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>Blog Post</h1>
-<table>
-    <tr>
-        <th>Post:</th>
-        <td>{{ post['question'] }}</td>
-    </tr>
-    <tr>
-        <th>By:</th>
-        <td>{{ post['blogger'] }}</td>
-    </tr>
-</table>
+<nav class="navbar fixed-top navbar-light bg-light"
+    <a class="navbar-brand" href="#"><h3>Blog Post</h3></a>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="/home">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/posts">View all posts</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/log_out">Log Out</a>
+      </li>
+    </ul>
+</nav>
 
-<div class="add_comment">
+<div class="jumbotron">
+    <p class="lead">Displaying Blog Post</p>
+    <div class="card">
+      <div class="card-body">
+        <h3 class="title">{{ post['question'] }}</h3>
+        <h6 class="card-subtitle mb-2 text-muted">Submitted By: {{ post['blogger'] }}</h6>
+      </div>
+    </div>
+
+
+    <br>
     <h2>Add a Comment</h2>
-
-    <form action="{{ url_for('add_comment', blog_id=post['blog_id']) }}" method="POST">
-        <table>
-            <tr>
-                <th>User:</th>
-                <td>{{ users[session['user_id']] }}</td>
-            </tr>
-            <tr>
-                <th>Comment:</th>
-                <td><input type="text" name="comment"></td>
-            </tr>
-            <tr>
-                <th></th>
-                <td><p><input type="submit"></p></td>
-            </tr>
-        </table>
+    <form action="{{ url_for('add_post') }}" method="POST">
+        <div class="input-group my-3">
+            <span class="input-group-text">User:</span>
+            <input type="text" class="form-control" placeholder={{ users[session['user_id']] }} readonly>
+        </div>
+        <div class="input-group my-3">
+            <span class="input-group-text">Comment:</span>
+            <input type="text" class="form-control" name="comment" placeholder="Enter...">
+        </div>
+        <input type="submit">
     </form>
+
+    <br>
+    <p class="lead">Comments</p>
+    {% for comment in comments %}
+        <div class="card">
+          <div class="card-body">
+            <h5 class="title">User: {{ users[comment['user_id']] }}</h5>
+            <h4 class="card-subtitle mb-2 text-muted">{{ comment['comment'] }}</h4>
+          </div>
+        </div>
+    {% endfor %}
 </div>
 
-<p>Comments</p>
-<table>
-    {% for comment in comments %}
-    <tr>
-        <th>User:</th>
-        <td>{{ users[comment['user_id']] }}</td>
-    </tr>
-    <tr>
-        <th>Comment:</th>
-        <td>{{ comment['comment'] }}</td>
-    </tr>
-    {% endfor %}
-</table>
-
-
 <p><a href="{{ url_for('posts') }}">Go back</a></p>
-
-<p><a href="{{ url_for('log_out')}}">Log Out</a></p>
 
 
 {% endblock %}

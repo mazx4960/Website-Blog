@@ -1,20 +1,25 @@
 {% extends "layout.html" %}
 
 {% block body %}
-    <h1>Sign up to start posting</h1>
+<div class="jumbotron">
+    <div class="page-header">
+        <h1>Sign up to start posting</h1>
+    </div>
+
     <form action="{{ url_for('sign_up_submit' )}}" method="POST">
-        <ul>
-            <li>
-                <input type="text" name="username" placeholder="Username">
-            </li>
-            <li>
-                <input type="password" name="password" placeholder="Password">
-            </li>
-            <li>
-                <input type="submit" value="Sign Up">
-            </li>
-        </ul>
+        <div class="form-group my-3">
+            <label for="exampleInputEmail1">Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Username">
+            <small id="emailHelp" class="form-text text-muted">You can use your nickname or email address.</small>
+        </div>
+        <div class="form-group my-3">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
     </form>
+
+</div>
 
 
 {% endblock %}

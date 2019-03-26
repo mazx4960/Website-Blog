@@ -1,23 +1,25 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<div class="jumbotron">
+    <div class="page-header">
+        <h1>Sign in to view blogs</h1>
+    </div>
 
-    <h1>Sign in to view blogs</h1>
     <form action="{{ url_for('sign_in_submit' )}}" method="POST">
-        <ul>
-            <li>
-                <input type="text" name="username" placeholder="Username">
-            </li>
-            <li>
-                <input type="password" name="password" placeholder="Password">
-            </li>
-            <li>
-                <input type="submit" value="Sign In">
-            </li>
-            <li>
-                <input type="submit" value="Sign Up Now" formaction="/sign_up">
-            </li>
-        </ul>
+        <div class="form-group my-3">
+            <label for="exampleInputEmail1">Username</label>
+            <input type="text" class="form-control" name="username" placeholder="Enter Username">
+        </div>
+        <div class="form-group my-3">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+
+        <a href="/sign_up" type="submit" class="btn btn-default">Sign Up Now</a>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+
     </form>
 
+</div>
 {% endblock %}

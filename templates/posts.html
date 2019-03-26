@@ -1,20 +1,32 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h1>Blog Posts</h1>
-<p><a href="{{ url_for('home')}}">Home</a></p>
-<table>
-    {% for post in user_posts %}
-        <tr>
-            <td>
-                <a href="{{ url_for('view', id=post['id']) }}">
-                    {{ post['post'] }}
-                </a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
+<nav class="navbar fixed-top navbar-light bg-light"
+    <a class="navbar-brand" href="#"><h3>All Blog Posts</h3></a>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="/home">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/posts">View all posts</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/log_out">Log Out</a>
+      </li>
+    </ul>
+</nav>
 
-<p><a href="{{ url_for('log_out')}}">Log Out</a></p>
+<div class="jumbotron">
+    <p class="lead">Displaying All Blog Posts</p>
+    {% for post in user_posts %}
+      <a href="{{ url_for('view', id=post['id']) }}">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="title">{{ post['post'] }}</h5>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+</div>
 
 {% endblock %}

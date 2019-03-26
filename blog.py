@@ -32,7 +32,7 @@ def sign_in_submit():
         session['user_id'] = user[0][0]
         return redirect(url_for('home'))
 
-@app.route('/sign_up/', methods=['POST'])
+@app.route('/sign_up/')
 def sign_up():
     return render_template('sign_up.html')
 
