@@ -1,6 +1,6 @@
 # Website-Blog
 
-A simple blogging website that allows you to post questions and comments on posts
+A simple blog website that allows you to post questions and comments on posts
 
 # Notes
 
@@ -24,6 +24,12 @@ Installing
 Install and update using `pip`_:
 
     pip install -U Flask
+    
+Running the website
+
+    cd <path to the app directory>
+    export FLASK_APP=blog.py
+    flask run
     
     
 # Features
