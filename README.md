@@ -35,5 +35,5 @@ Install and update using `pip`_:
 # Future enhancements
 
 * More robust User authentication system
-* Better UI through css
+* Better UI through CSS
 * password hashing instead of just plain text
