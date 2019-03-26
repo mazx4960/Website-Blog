@@ -43,3 +43,6 @@ Running the website
 * More robust User authentication system
 * Better UI through CSS preferrably using bootstrap (done)
 * password hashing instead of just plain text
+* implementation of emails
+** notify you when you have registered for an account
+** reset your password if you have forgotten it
