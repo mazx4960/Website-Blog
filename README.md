@@ -41,5 +41,5 @@ Running the website
 # Future enhancements
 
 * More robust User authentication system
-* Better UI through CSS
+* Better UI through CSS preferrably using bootstrap
 * password hashing instead of just plain text
