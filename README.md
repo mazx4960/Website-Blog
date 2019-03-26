@@ -4,7 +4,7 @@ A simple blog website that allows you to post questions and comments on posts
 
 # Notes
 
-This website was designed for me to learn more about the basics functionality of flask.
+This website was designed for me to learn more about the basic functionality of flask.
 
 This website was created using Flask. Flask is a lightweight `WSGI`_ web application framework. It is designed
 to make getting started quick and easy, with the ability to scale up to
