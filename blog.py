@@ -60,8 +60,7 @@ def sign_up_submit():
             msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
 
             sender_email = "noreply9874321@gmail.com"
-            #password = input("Enter your password: ")
-            password = "qazwsx!@#123"
+            password = input("Enter your password: ")
 
             server = smtplib.SMTP('smtp.gmail.com',587)
             server.ehlo()
