@@ -40,12 +40,13 @@ Running the website
 
 # Future enhancements
 
-* Validates the fields of inputs
-* More robust User authentication system
+* Private messaging function
 * Allows you to view user profile
+* More robust User authentication system
 * Implementation of emails
     * notify you when you have registered for an account (done)   
     * reset your password if you have forgotten it
 * Allow more than one session at a time (done)
 * Password hashing instead of just plain text (done)
 * Better UI through CSS preferrably using bootstrap (done)
+* Validates the fields of inputs (done)
