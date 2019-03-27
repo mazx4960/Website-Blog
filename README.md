@@ -40,6 +40,7 @@ Running the website
 
 # Future enhancements
 
+* Deleting and editing Posts and Comments - only the ones written by you
 * Private messaging function
 * Allows you to view user profile
 * More robust User authentication system
