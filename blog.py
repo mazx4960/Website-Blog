@@ -55,8 +55,8 @@ def sign_up_submit():
             db.execute('INSERT INTO Users (username,password) VALUES(?,?)', (username,password) )
             db.commit()
             session['logged_in'] = True
-            session['user_id'] = username
-
+            id_row = db.execute('SELECT id FROM Users WHERE username=?',(username,)).fetchall()
+            session['user_id'] = id_row[0][0]
             msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
 
             sender_email = "noreply9874321@gmail.com"
