@@ -40,6 +40,7 @@ Running the website
 
 # Future enhancements
 
+* background threading for sending the email and posting
 * Private messaging function
 * Allows you to view user profile
 * More robust User authentication system
