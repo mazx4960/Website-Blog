@@ -40,7 +40,6 @@ Running the website
 
 # Future enhancements
 
-* background threading for sending the email and posting
 * Private messaging function
 * Allows you to view user profile
 * More robust User authentication system
@@ -51,3 +50,4 @@ Running the website
 * Password hashing instead of just plain text (done)
 * Better UI through CSS preferrably using bootstrap (done)
 * Validates the fields of inputs (done)
+* background threading for sending the email and posting (done)
