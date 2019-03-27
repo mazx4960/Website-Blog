@@ -40,9 +40,11 @@ Running the website
 
 # Future enhancements
 
+* Allow more than one session at a time
 * More robust User authentication system
 * Better UI through CSS preferrably using bootstrap (done)
 * password hashing instead of just plain text
 * implementation of emails
-    * notify you when you have registered for an account    
+    * notify you when you have registered for an account (done)   
     * reset your password if you have forgotten it
+* allows you to view user profile
