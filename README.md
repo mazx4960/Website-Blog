@@ -42,7 +42,7 @@ Running the website
 
 * Allow more than one session at a time
 * Validates the fields of inputs
-* Password hashing instead of just plain text
+* Password hashing instead of just plain text (done)
 * More robust User authentication system
 * Better UI through CSS preferrably using bootstrap (done)
 * Implementation of emails
