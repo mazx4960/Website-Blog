@@ -1,11 +1,11 @@
 import sqlite3
-from flask import Flask, request, render_template, redirect, url_for
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask import Flask, request, render_template, redirect, url_for, session
+
 from werkzeug.security import generate_password_hash, check_password_hash
 import smtplib
 
 app = Flask(__name__)
-session = {'logged_in':False, 'user_id':None}
+app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 def get_db():
     db = sqlite3.connect('blog.sqlite3')
@@ -19,10 +19,9 @@ def sign_in():
         password = request.form.get('password')
         db = get_db()
         user = db.execute('SELECT * FROM Users WHERE username=?',(username,)).fetchall()
-        if user == [] or user[0][2] != password:
+        if user == [] or not check_password_hash(user[0][2], password):
             return error()
         else:
-            session['logged_in'] = True
             session['user_id'] = user[0][0]
             return redirect(url_for('home'))
     else:
@@ -41,9 +40,9 @@ def sign_up():
             if db.execute('SELECT * FROM Users WHERE username=?',(username,)).fetchall() != []:
                 return error()
             else:
-                db.execute('INSERT INTO Users (username,password) VALUES(?,?)', (username,password) )
+                hashed_password = generate_password_hash(password)
+                db.execute('INSERT INTO Users (username,password) VALUES(?,?)', (username,hashed_password) )
                 db.commit()
-                session['logged_in'] = True
                 id_row = db.execute('SELECT id FROM Users WHERE username=?',(username,)).fetchall()
                 session['user_id'] = id_row[0][0]
                 msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
@@ -66,8 +65,7 @@ def sign_up():
 
 @app.route('/log_out/')
 def log_out():
-    session['logged_in'] = False
-    session['user_id'] = None
+    session.pop('user_id', None)
     return sign_in()
 
 @app.route('/error/')
@@ -76,7 +74,7 @@ def error():
 
 @app.route('/home/')
 def home():
-    if session['logged_in']==False:
+    if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
         user_id = session['user_id']
@@ -88,7 +86,7 @@ def home():
 
 @app.route('/posts')
 def posts():
-    if session['logged_in']==False:
+    if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
         user_id = session['user_id']
@@ -98,7 +96,7 @@ def posts():
 
 @app.route('/view/<int:id>/')
 def view(id):
-    if session['logged_in']==False:
+    if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
         db = get_db()
@@ -115,7 +113,7 @@ def view(id):
 
 @app.route('/add_post/', methods=['POST'])
 def add_post():
-    if session['logged_in']==False:
+    if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
         post = request.form.get('post')
@@ -131,7 +129,7 @@ def add_post():
 @app.route('/add_comment/<int:blog_id>/', methods=['POST'])
 def add_comment(blog_id):
     # TODO add a comment to a post
-    if session['logged_in']==False:
+    if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
         comment = request.form.get('comment')
