@@ -21,6 +21,19 @@
 
 <div class="jumbotron">
     <h1 class="display-4">Welcome back, {{ username }}</h1><br>
+
+    <h2>Add a Post</h2>
+    <form action="{{ url_for('add_post') }}" method="POST">
+        <div class="input-group my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Question:</span>
+            </div>
+            <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
+        </div>
+        <input type="submit">
+    </form>
+
+    <br>
     <p class="lead">Displaying Past Blog Posts</p>
     {% for post in user_posts %}
       <a href="{{ url_for('view', id=post['id']) }}">
@@ -35,18 +48,6 @@
         </div>
       </a>
     {% endfor %}
-
-    <br>
-    <h2>Add a Post</h2>
-    <form action="{{ url_for('add_post') }}" method="POST">
-        <div class="input-group my-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Question:</span>
-            </div>
-            <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
-        </div>
-        <input type="submit">
-    </form>
 
 </div>
 
