@@ -12,7 +12,6 @@ def get_db():
 
 @app.route('/')
 def sign_in():
-    return("<h1>It is working</h1>")
     if session['logged_in']==False:
         return render_template('sign_in.html')
     else:
