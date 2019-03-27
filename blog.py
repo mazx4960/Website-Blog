@@ -89,7 +89,6 @@ def posts():
     if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
-        user_id = session['user_id']
         db = get_db()
         user_posts = db.execute('SELECT * FROM Blogs').fetchall()
         return render_template('posts.html', user_posts=user_posts)

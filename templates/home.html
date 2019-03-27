@@ -24,9 +24,13 @@
     <p class="lead">Displaying Past Blog Posts</p>
     {% for post in user_posts %}
       <a href="{{ url_for('view', id=post['id']) }}">
-        <div class="card">
+        <div class="card" style="height: 70px;">
           <div class="card-body">
-            <h5 class="title">{{ post['post'] }}</h5>
+            {% if post['post']|length > 50: %}
+              <h5 class="title">{{ post['post'][:50] }}...</h5>
+            {% else: %}
+              <h5 class="title">{{ post['post'] }}</h5>
+            {% endif %}
           </div>
         </div>
       </a>
@@ -39,7 +43,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">Question:</span>
             </div>
-            <textarea class="form-control" name="post" placeholder="Enter here..."></textarea>
+            <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
         </div>
         <input type="submit">
     </form>
