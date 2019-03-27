@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask, request, render_template, redirect, url_for
+import smtplib
 
 app = Flask(__name__)
 session = {'logged_in':False, 'user_id':None}
@@ -11,7 +12,10 @@ def get_db():
 
 @app.route('/')
 def sign_in():
-    return render_template('sign_in.html')
+    if session['logged_in']==False:
+        return render_template('sign_in.html')
+    else:
+        return home()
 
 @app.route('/log_out/')
 def log_out():
@@ -40,8 +44,8 @@ def sign_up():
 def sign_up_submit():
     username = request.form.get('username')
     password = request.form.get('password')
-    print(username,password)
-    if not username or not password:
+    recipient_email = request.form.get('email')
+    if not username or not password or not recipient_email:
         return error()
     else:
         db = get_db()
@@ -52,6 +56,21 @@ def sign_up_submit():
             db.commit()
             session['logged_in'] = True
             session['user_id'] = username
+
+            msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
+
+            sender_email = "noreply9874321@gmail.com"
+            #password = input("Enter your password: ")
+            password = "qazwsx!@#123"
+
+            server = smtplib.SMTP('smtp.gmail.com',587)
+            server.ehlo()
+            server.starttls()
+            # Ensure that you have enabled less secure app access in your email account
+            server.login(sender_email,password)
+            server.sendmail(sender_email,recipient_email,msg)
+            server.quit()
+
             return redirect(url_for('home'))
 
 @app.route('/error/')
@@ -66,7 +85,9 @@ def home():
         user_id = session['user_id']
         db = get_db()
         user_posts = db.execute('SELECT * FROM Blogs WHERE blogger_id=?',(user_id,)).fetchall()
-        return render_template('home.html', user_posts=user_posts)
+        user = db.execute('SELECT * FROM Users WHERE id=?',(user_id,)).fetchall()
+        username = user[0][1]
+        return render_template('home.html', user_posts=user_posts, username=username)
 
 @app.route('/posts')
 def posts():
