@@ -21,7 +21,6 @@ COMMENTS_URL = '/comment'
 
 @app.route('/', methods=['GET','POST'])
 def sign_in():
-    return '<h1>Hello</h1>'
     if request.method=='POST':
         username, password = request.form.get('username'), request.form.get('password')
 
