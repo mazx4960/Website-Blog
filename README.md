@@ -40,6 +40,7 @@ Running the website
 
 # Future enhancements
 
+* Add API token authentication
 * Deleting and editing Posts and Comments - only the ones written by you
 * Private messaging function
 * Allows you to view user profile
@@ -47,6 +48,7 @@ Running the website
 * Implementation of emails
     * notify you when you have registered for an account (done)   
     * reset your password if you have forgotten it
+* Migration of database to another server (done)
 * Allow more than one session at a time (done)
 * Password hashing instead of just plain text (done)
 * Better UI through CSS preferrably using bootstrap (done)
