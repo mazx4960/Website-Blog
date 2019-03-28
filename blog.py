@@ -1,20 +1,23 @@
 import sqlite3
 
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for
+# sessions is built on top of cookies which is sent to the server the authenticate the user
+from flask import session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import smtplib
-
 import threading
+import requests
+import json
 
 # SECRETY_KET is needed in order to store sessions
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
-def get_db():
-    db = sqlite3.connect('blog.sqlite3')
-    db.row_factory = sqlite3.Row
-    return db
+BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
+USERS_URL = '/user'
+BLOGS_URL = '/blog'
+COMMENTS_URL = '/comment'
 
 @app.route('/', methods=['GET','POST'])
 def sign_in():
@@ -22,15 +25,19 @@ def sign_in():
         username, password = request.form.get('username'), request.form.get('password')
 
         # checking if the username exists in the database
-        db = get_db()
-        user = db.execute('SELECT * FROM Users WHERE username=?',(username,)).fetchall()
+        response = requests.get(BASE_URL + USERS_URL,params={'username':username})
+        if response.status_code == 404:
+            return error()
+
+        user = json.loads(response.json())
 
         # checking if the password matches the one provided
-        if user == [] or not check_password_hash(user[0][2], password):
+        if not check_password_hash(user[0]['password'], password):
             return error()
-        else:
-            session['user_id'] = user[0][0]
-            return redirect(url_for('home'))
+
+        session['user_id'] = user[0]['user_id']
+        return redirect(url_for('home'))
+
     else:
         return render_template('sign_in.html')
 
@@ -45,25 +52,24 @@ def sign_up():
             return error()
         else:
             # Checking if the user has registered before
-            db = get_db()
-            if db.execute('SELECT * FROM Users WHERE username=?',(username,)).fetchall() != []:
+            hashed_password = generate_password_hash(password)
+            parameters = {'username':username, 'password':hashed_password}
+            response = requests.post(BASE_URL + USERS_URL,params=parameters)
+            if response.status_code == 400:
                 return error()
-            else:
-                hashed_password = generate_password_hash(password)
-                db.execute('INSERT INTO Users (username,password) VALUES(?,?)', (username,hashed_password) )
-                db.commit()
 
-                # getting the user_id of the new user
-                user_data = db.execute('SELECT id FROM Users WHERE username=?',(username,)).fetchall()
-                session['user_id'] = user_data[0][0]
+            # getting the user_id of the new user
+            response = requests.get(BASE_URL + USERS_URL,params={'username':username})
+            user = json.loads(response.json())
+            session['user_id'] = user[0]['user_id']
 
-                # sending the confirmation email in the background thread
-                msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
-                thread = threading.Thread(target=sendEmail, args=(recipient_email,msg))
-                thread.daemon = True
-                thread.start()
+            # sending the confirmation email in the background thread
+            msg = "You have been registered successfully!\nUsername: {0}\nPassword: {1}\n".format(username,password)
+            thread = threading.Thread(target=sendEmail, args=(recipient_email,msg))
+            thread.daemon = True
+            thread.start()
 
-                return redirect(url_for('home'))
+            return redirect(url_for('home'))
     else:
         return render_template('sign_up.html')
 
@@ -95,12 +101,16 @@ def home():
     if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
-        # getting all the blogs posted by the current user
+        # getting user details
         user_id = session['user_id']
-        db = get_db()
-        user_posts = db.execute('SELECT * FROM Blogs WHERE blogger_id=?',(user_id,)).fetchall()
-        user = db.execute('SELECT * FROM Users WHERE id=?',(user_id,)).fetchall()
-        username = user[0][1]
+        response = requests.get(BASE_URL + USERS_URL,params={'user_id':user_id})
+        user = json.loads(response.json())
+        username = user[0]['username']
+
+        # getting all the blogs posted by the current user
+        response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
+        user_posts = json.loads(response.json())
+
         return render_template('home.html', user_posts=user_posts, username=username)
 
 @app.route('/posts')
@@ -109,30 +119,34 @@ def posts():
         return render_template('sign_in.html')
     else:
         # getting all the blogs posted
-        db = get_db()
-        user_posts = db.execute('SELECT * FROM Blogs').fetchall()
+        response = requests.get(BASE_URL + BLOGS_URL)
+        user_posts = json.loads(response.json())
+
         return render_template('posts.html', user_posts=user_posts)
 
-@app.route('/view/<int:id>/')
-def view(id):
+@app.route('/view/<int:blog_id>/')
+def view(blog_id):
     if 'user_id' not in session:
         return render_template('sign_in.html')
     else:
-        db = get_db()
-
         # storing the user id and the username in a dictionary
-        users_data = db.execute('SELECT * FROM Users')
+        response = requests.get(BASE_URL + USERS_URL)
+        users_data = json.loads(response.json())
+
         users = {}
         for user_data in users_data:
             user = []
-            users[user_data['id']] = user_data['username']
+            users[user_data['user_id']] = user_data['username']
 
         # getting the specific blog data
-        post_row = db.execute('SELECT * FROM Blogs WHERE id=?',(id,)).fetchall()
-        post = {'blog_id':post_row[0][0],'question':post_row[0][2], 'blogger':users[post_row[0][1]]}
+        response = requests.get(BASE_URL + BLOGS_URL,params={'blog_id':blog_id})
+        post_row = json.loads(response.json())
+
+        post = {'blog_id':post_row[0]['blog_id'],'question':post_row[0]['post'], 'blogger':users[post_row[0]['blogger_id']]}
 
         # getting all the comments associated with the blog
-        comments = db.execute('SELECT * FROM Comments WHERE blog_id=?',(id,)).fetchall()
+        response = requests.get(BASE_URL + COMMENTS_URL + '/' + str(blog_id))
+        comments = json.loads(response.json())
 
         return render_template('view.html', comments=comments, post=post, users=users, session=session)
 
@@ -145,10 +159,11 @@ def add_post():
         if not post:
             return error()
         else:
-            db = get_db()
-            db.execute('INSERT INTO Blogs (blogger_id,post) VALUES (?, ?)' , (session['user_id'], post))
-            db.commit()
-            db.close()
+            parameters = {'blogger_id':session['user_id'], 'post':post}
+            response = requests.post(BASE_URL + BLOGS_URL, params=parameters)
+            if response.status_code == 404:
+                return error()
+
             return home()
 
 @app.route('/add_comment/<int:blog_id>/', methods=['POST'])
@@ -161,10 +176,7 @@ def add_comment(blog_id):
         if not comment:
             return error()
         else:
-            db = get_db()
-            blog_row = db.execute('SELECT * FROM Blogs WHERE id=?',(blog_id,)).fetchall()
-            db.execute('INSERT INTO Comments (user_id, comment, blog_id) \
-            VALUES (?, ?, ?)' , (session['user_id'], comment, blog_row[0][0]))
-            db.commit()
-            db.close()
+            parameters = {'user_id':session['user_id'], 'comment':comment}
+            response = requests.post(BASE_URL + COMMENTS_URL + '/' + str(blog_id), params = parameters)
+
             return view(blog_id)

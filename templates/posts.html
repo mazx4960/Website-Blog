@@ -21,7 +21,7 @@
 <div class="jumbotron">
     <p class="lead">Displaying All Blog Posts</p>
     {% for post in user_posts %}
-      <a href="{{ url_for('view', id=post['id']) }}">
+      <a href="{{ url_for('view', blog_id=post['blog_id']) }}">
         <div class="card" style="height: 70px;">
           <div class="card-body">
             {% if post['post']|length > 50: %}
