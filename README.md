@@ -46,9 +46,7 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Adding a new tab to the nav bar : (Today/Home, My Posts) replacing Home
-* Add time stamp to the blogs and comments
-* Display Blogs Sorted by time stamp
+* Add time stamp to comments
 * Allows you to add friends
 * Setting a blog post to be seen by: myself, friends or everyone
 
@@ -59,6 +57,8 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Adding a new tab to the nav bar : (Today/Home, My Posts) replacing Home (done)
+* Add time stamp to the blogs (done)
 * Allows you to view user profile (done)
 * Admin login dashboard to see all the users and activities (done)
 * Implementation of emails
