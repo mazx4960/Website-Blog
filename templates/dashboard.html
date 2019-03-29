@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<nav class="navbar fixed-top navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#"><h3>Developer Mode</h3></a>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link active" href="/developer/home">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/developer/log_out">Log Out</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="jumbotron">
+
+  <p class="lead">
+    <span>Number of active users:</span>
+    <span class="badge badge-primary badge-pill">{{ users|length }}</span>
+  </p><br>
+
+  <p class="lead">Displaying All Users</p>
+  <ul class="list-group">
+    {% for user in users %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ user['user_id'] }} &nbsp;&nbsp;&nbsp;&nbsp; {{ user['username'] }}</span>
+        <span>{{ user['email'] }}</span>
+        {% if user['username'] == 'admin' %}
+          <span class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</span>
+        {% elif user['admin'] == 'pending' or user['admin'] == 'false' %}
+          <a href="{{ url_for('dev_promote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+        {% elif user['admin'] == 'true' %}
+          <a href="{{ url_for('dev_demote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul><br>
+
+  <p class="lead">Displaying All Blogs</p>
+  <ul class="list-group">
+    {% for post in user_posts %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {% if post['post']|length > 50: %}
+          <span>{{ post['post'][:50] }}...</span>
+        {% else: %}
+          <span>{{ post['post'] }}</span>
+        {% endif %}
+        <span class="badge badge-primary badge-pill">Posted by: {{ usernames[post['blogger_id']] }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+</div>
+
+{% endblock %}
