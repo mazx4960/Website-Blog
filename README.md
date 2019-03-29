@@ -45,18 +45,18 @@ Running the website
 
 # Future enhancements
 
-## Priority updates
+### Priority updates
 * Admin login dashboard to see all the users and activities 
 * Allows you to view user profile and adding friends
 * Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
 * Private messaging function
 
-## Minor updates
+### Minor updates
 * Add API token authentication
 * More robust User authentication system
 
-## Completed updates
+### Completed updates
 * Implementation of emails
     * notify you when you have registered for an account (done)   
     * reset your password if you have forgotten it
