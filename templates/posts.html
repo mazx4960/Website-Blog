@@ -6,7 +6,10 @@
     <a class="navbar-brand" href="#"><h3>All Blog Posts</h3></a>
     <ul class="nav nav-pills">
       <li class="nav-item">
-        <a class="nav-link" href="/home">Home</a>
+        <a class="nav-link" href="/home">Today</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/myposts">My Posts</a>
       </li>
       <li class="nav-item">
         <a class="nav-link active" href="/posts">View all posts</a>
@@ -19,20 +22,25 @@
 </nav>
 
 <div class="jumbotron">
-    <p class="lead">Displaying All Blog Posts</p>
-    {% for post in user_posts %}
-      <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
-        <div class="card" style="height: 70px;">
-          <div class="card-body">
+  <p class="lead"><b>Displaying All Blog Posts</b></p>
+  {% for timestamp in user_posts.keys() %}
+    <p class="lead">{{ timestamp }}</p>
+    <ul class="list-group">
+      {% for post in user_posts[timestamp] %}
+        <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
             {% if post['post']|length > 50: %}
-              <h5 class="title">{{ post['post'][:50] }}...</h5>
+              <span class="title">{{ post['post'][:50] }}...</span>
             {% else: %}
-              <h5 class="title">{{ post['post'] }}</h5>
+              <span class="title">{{ post['post'] }}</span>
             {% endif %}
-          </div>
-        </div>
-      </a>
-    {% endfor %}
+            <span class="badge badge-primary badge-pill">Posted By: {{ post['blogger'] }}</span>
+          </li>
+        </a>
+      {% endfor %}
+    </ul>
+    <br>
+  {% endfor %}
 </div>
 
 {% endblock %}

@@ -11,6 +11,8 @@ import threading
 import requests
 import json
 
+from datetime import datetime
+
 # SECRETY_KET is needed in order to store sessions
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -192,7 +194,7 @@ def dev_sign_up():
 @app.route('/developer/home/')
 def dev_dashboard():
     if 'admin_id' not in session:
-        return render_template('sign_in.html')
+        return render_template('dev_sign_in.html')
 
     # get all data
     response = requests.get(BASE_URL + USERS_URL)
@@ -210,7 +212,7 @@ def dev_dashboard():
 @app.route('/developer/promote/<int:user_id>')
 def dev_promote(user_id):
     if 'admin_id' not in session:
-        return render_template('sign_in.html')
+        return render_template('dev_sign_in.html')
 
     parameters = {'user_id':user_id, 'admin':'true'}
     response = requests.put(BASE_URL + USERS_URL, params=parameters)
@@ -219,10 +221,19 @@ def dev_promote(user_id):
 @app.route('/developer/demote/<int:user_id>')
 def dev_demote(user_id):
     if 'admin_id' not in session:
-        return render_template('sign_in.html')
+        return render_template('dev_sign_in.html')
 
     parameters = {'user_id':user_id, 'admin':'false'}
     response = requests.put(BASE_URL + USERS_URL, params=parameters)
+    return dev_dashboard()
+
+@app.route('/developer/delete/<int:user_id>')
+def dev_delete_user(user_id):
+    if 'admin_id' not in session:
+        return render_template('dev_sign_in.html')
+
+    parameters = {'user_id':user_id}
+    response = requests.delete(BASE_URL + USERS_URL, params=parameters)
     return dev_dashboard()
 
 @app.route('/developer/log_out/')
@@ -243,7 +254,7 @@ def dev_error():
 def error():
     return render_template('error.html')
 
-@app.route('/home/')
+@app.route('/home')
 def home():
     if 'user_id' not in session:
         return render_template('sign_in.html')
@@ -258,18 +269,71 @@ def home():
 
     # getting all the blogs posted by the current user
     response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
-    user_posts = json.loads(response.json())
+    data = json.loads(response.json())
+
+    user_posts = []
+    timestamp = datetime.now().strftime('%Y-%m-%d')
+    for post in data:
+        if post['timestamp'][:10] == timestamp:
+            user_posts.append(post)
 
     return render_template('home.html', user_posts=user_posts, username=username)
+
+@app.route('/myposts')
+def myposts():
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # getting user details
+    user_id = session['user_id']
+
+    # getting all the blogs posted by the current user
+    response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
+    data = json.loads(response.json())
+
+    user_posts = {}
+    for post in data:
+        temp = {
+            'blog_id'   :post['blog_id'],
+            'blogger_id':post['blogger_id'],
+            'post'      :post['post']
+        }
+        if post['timestamp'][:10] in user_posts.keys():
+            user_posts[post['timestamp'][:10]].append(temp)
+        else:
+            user_posts[post['timestamp'][:10]] = [temp]
+
+    return render_template('myposts.html', user_posts=user_posts)
 
 @app.route('/posts')
 def posts():
     if 'user_id' not in session:
         return render_template('sign_in.html')
 
+    # storing the user id and the username in a dictionary
+    response = requests.get(BASE_URL + USERS_URL)
+    users_data = json.loads(response.json())
+
+    users = {}
+    for user_data in users_data:
+        users[user_data['user_id']] = user_data['username']
+
     # getting all the blogs posted
     response = requests.get(BASE_URL + BLOGS_URL)
-    user_posts = json.loads(response.json())
+    data = json.loads(response.json())
+
+    user_posts = {}
+    for post in data:
+        temp = {
+            'blog_id'   :post['blog_id'],
+            'blogger_id':post['blogger_id'],
+            'post'      :post['post'],
+            'blogger'   :users[post['blogger_id']]
+        }
+        if post['timestamp'][:10] in user_posts.keys():
+            user_posts[post['timestamp'][:10]].append(temp)
+        else:
+            user_posts[post['timestamp'][:10]] = [temp]
 
     return render_template('posts.html', user_posts=user_posts)
 
@@ -288,14 +352,9 @@ def view_post(blog_id):
 
     # getting the specific blog data
     response = requests.get(BASE_URL + BLOGS_URL,params={'blog_id':blog_id})
-    post_row = json.loads(response.json())
-
-    post = {
-        'blogger_id':post_row[0]['blogger_id'],
-        'blog_id':post_row[0]['blog_id'],
-        'post':post_row[0]['post'],
-        'blogger':users[post_row[0]['blogger_id']]
-    }
+    posts = json.loads(response.json())
+    post = posts[0]
+    post['blogger'] = users[post['blogger_id']]
 
     # getting all the comments associated with the blog
     response = requests.get(BASE_URL + COMMENTS_URL + '/' + str(blog_id))
@@ -334,7 +393,13 @@ def add_post():
     if not post:
         return error()
 
-    parameters = {'blogger_id':session['user_id'], 'post':post}
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    parameters = {
+        'blogger_id':session['user_id'],
+        'post':post,
+        'timestamp':timestamp
+    }
     response = requests.post(BASE_URL + BLOGS_URL, params=parameters)
 
     if response.status_code == 404:

@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<nav class="navbar fixed-top navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="#"><h3>Your Blog Posts</h3></a>
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link" href="/home">Today</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/myposts">My Posts</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/posts">View all posts</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/log_out">Log Out</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="jumbotron">
+
+    <p class="lead"><b>Displaying Past Blog Posts</b></p>
+    {% for timestamp in user_posts.keys() %}
+      <p class="lead">{{ timestamp }}</p>
+      <ul class="list-group">
+        {% for post in user_posts[timestamp] %}
+          <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
+            <li class="list-group-item">
+              {% if post['post']|length > 50: %}
+                <span class="title">{{ post['post'][:50] }}...</span>
+              {% else: %}
+                <span class="title">{{ post['post'] }}</span>
+              {% endif %}
+            </li>
+          </a>
+        {% endfor %}
+      </ul>
+      <br>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

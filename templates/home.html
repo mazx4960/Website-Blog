@@ -7,7 +7,10 @@
     <a class="navbar-brand" href="#"><h3>Your Blog Posts</h3></a>
     <ul class="nav nav-pills">
       <li class="nav-item">
-        <a class="nav-link active" href="/home">Home</a>
+        <a class="nav-link active" href="/home">Today</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/myposts">My Posts</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/posts">View all posts</a>
@@ -30,25 +33,24 @@
             </div>
             <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
         </div>
-        <input type="submit">
+        <button type="button" class="btn btn-primary">submit</button>
     </form>
 
     <br>
-    <p class="lead">Displaying Past Blog Posts</p>
-    {% for post in user_posts %}
-      <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
-        <div class="card" style="height: 70px;">
-          <div class="card-body">
+    <p class="lead">Displaying Today's Blog Posts</p>
+    <ul class="list-group">
+      {% for post in user_posts %}
+        <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
+          <li class="list-group-item">
             {% if post['post']|length > 50: %}
-              <h5 class="title">{{ post['post'][:50] }}...</h5>
+              <span class="title">{{ post['post'][:50] }}...</span>
             {% else: %}
-              <h5 class="title">{{ post['post'] }}</h5>
+              <span class="title">{{ post['post'] }}</span>
             {% endif %}
-          </div>
-        </div>
-      </a>
-    {% endfor %}
-
+          </li>
+        </a>
+      {% endfor %}
+    </ul>
 </div>
 
 {% endblock %}

@@ -31,13 +31,26 @@
         {% if user['username'] == 'admin' %}
           <span class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</span>
         {% elif user['admin'] == 'pending' or user['admin'] == 'false' %}
-          <a href="{{ url_for('dev_promote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+          <div>
+            <a href="{{ url_for('dev_delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
+            <a href="{{ url_for('dev_promote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+          </div>
         {% elif user['admin'] == 'true' %}
-          <a href="{{ url_for('dev_demote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+          <div>
+            <a href="{{ url_for('dev_delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
+            <a href="{{ url_for('dev_demote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+          </div>
         {% endif %}
       </li>
     {% endfor %}
   </ul><br>
+
+  <br>
+  <p class="lead">
+    <span>Total Posts:</span>
+    <span class="badge badge-primary badge-pill">{{ user_posts|length }}</span>
+  </p>
+  <br>
 
   <p class="lead">Displaying All Blogs</p>
   <ul class="list-group">
