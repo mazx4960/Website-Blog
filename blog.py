@@ -125,7 +125,7 @@ def log_out():
 def dev_sign_in():
     # log users out of the main app
     session.pop('user_id', None)
-    
+
     if 'admin_id' in session:
         return dev_dashboard()
 
@@ -135,14 +135,14 @@ def dev_sign_in():
 
         # checking if the fields are empty
         if not username or not password:
-            return error()
+            return dev_error()
 
         # checking if the username exists in the database
         parameters = { 'username': username }
         response = requests.get(BASE_URL + USERS_URL,params=parameters)
 
         if response.status_code == 404:
-            return error()
+            return dev_error()
 
         user = json.loads(response.json())
 
@@ -152,7 +152,7 @@ def dev_sign_in():
 
         # checking if the account is admin
         if user[0]['admin'] != 'true':
-            return error()
+            return dev_error()
 
         # all tests passed, adding the user_id to the session
         session['admin_id'] = user[0]['user_id']
@@ -170,7 +170,7 @@ def dev_sign_up():
 
         # checking if the field is null
         if not username or not password or not recipient_email:
-            return error()
+            return dev_error()
 
         # Checking if the user has registered before
         hashed_password = generate_password_hash(password)
@@ -183,7 +183,7 @@ def dev_sign_up():
         response = requests.post(BASE_URL + USERS_URL,params=parameters)
 
         if response.status_code == 400:
-            return error()
+            return dev_error()
 
         return render_template('dev_sign_in.html')
     else:
@@ -273,8 +273,8 @@ def posts():
 
     return render_template('posts.html', user_posts=user_posts)
 
-@app.route('/view/<int:blog_id>/')
-def view(blog_id):
+@app.route('/view_post/<int:blog_id>/')
+def view_post(blog_id):
     if 'user_id' not in session:
         return render_template('sign_in.html')
 
@@ -291,8 +291,9 @@ def view(blog_id):
     post_row = json.loads(response.json())
 
     post = {
+        'blogger_id':post_row[0]['blogger_id'],
         'blog_id':post_row[0]['blog_id'],
-        'question':post_row[0]['post'],
+        'post':post_row[0]['post'],
         'blogger':users[post_row[0]['blogger_id']]
     }
 
@@ -300,8 +301,25 @@ def view(blog_id):
     response = requests.get(BASE_URL + COMMENTS_URL + '/' + str(blog_id))
     comments = json.loads(response.json())
 
-    return render_template('view.html', comments=comments, post=post, \
+    return render_template('view_post.html', comments=comments, post=post, \
     users=users, session=session)
+
+@app.route('/view_profile/<int:user_id>/')
+def view_profile(user_id):
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # storing the user id and the username in a dictionary
+    parameters = { 'user_id':user_id }
+    response = requests.get(BASE_URL + USERS_URL, params=parameters)
+    users = json.loads(response.json())
+    user = users[0]
+
+    # getting the specific blog data
+    response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
+    posts = json.loads(response.json())
+
+    return render_template('view_profile.html', posts=posts, user=user)
 
 
 ########################### Adding comments or post ###########################
@@ -340,7 +358,7 @@ def add_comment(blog_id):
     if response.status_code == 404:
         return error()
 
-    return view(blog_id)
+    return view_post(blog_id)
 
 
 ########################### End of file ###########################

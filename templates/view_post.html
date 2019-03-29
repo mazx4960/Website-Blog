@@ -22,8 +22,11 @@
     <p class="lead">Displaying Blog Post</p>
     <div class="card">
       <div class="card-body">
-        <h3 class="title">{{ post['question'] }}</h3><br>
-        <h6 class="card-subtitle mb-2 text-muted">Submitted By: {{ post['blogger'] }}</h6>
+        <h3 class="title">{{ post['post'] }}</h3><br>
+        <h6 class="card-subtitle mb-2 text-muted">
+          Submitted By: <a href="{{ url_for('view_profile', user_id=post['blogger_id']) }}">
+            {{ post['blogger'] }}</a>
+        </h6>
       </div>
     </div>
 
@@ -47,7 +50,9 @@
     {% for comment in comments %}
         <div class="card">
           <div class="card-body">
-            <h5 class="title">@{{ users[comment['user_id']] }}</h5>
+            <a href="{{ url_for('view_profile', user_id=comment['user_id']) }}">
+              <h5 class="title">@{{ users[comment['user_id']] }}</h5>
+            </a>
             <h4 class="card-subtitle mb-2 text-muted">{{ comment['comment'] }}</h4>
           </div>
         </div>

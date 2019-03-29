@@ -1,16 +1,15 @@
 {% extends "layout.html" %}
 
 {% block body %}
-
 <nav class="navbar fixed-top navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="#"><h3>Your Blog Posts</h3></a>
+    <a class="navbar-brand" href="#"><h3>Blog Post</h3></a>
     <ul class="nav nav-pills">
       <li class="nav-item">
-        <a class="nav-link active" href="/home">Home</a>
+        <a class="nav-link" href="/home">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/posts">View all posts</a>
+        <a class="nav-link active" href="/posts">View all posts</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/log_out">Log Out</a>
@@ -20,22 +19,10 @@
 </nav>
 
 <div class="jumbotron">
-    <h1 class="display-4">Welcome back, {{ username }}</h1><br>
+    <h1 class="display-4">@{{ user['username'] }}'s Profile</h1><br>
 
-    <h2>Add a Post</h2>
-    <form action="{{ url_for('add_post') }}" method="POST">
-        <div class="input-group my-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Question:</span>
-            </div>
-            <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
-        </div>
-        <input type="submit">
-    </form>
-
-    <br>
-    <p class="lead">Displaying Past Blog Posts</p>
-    {% for post in user_posts %}
+    <p class="lead">Displaying {{ user['username'] }}'s Posts</p>
+    {% for post in posts %}
       <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
         <div class="card" style="height: 70px;">
           <div class="card-body">
@@ -48,7 +35,9 @@
         </div>
       </a>
     {% endfor %}
-
 </div>
+
+<p><a href="{{ url_for('posts') }}">Go back</a></p>
+
 
 {% endblock %}
