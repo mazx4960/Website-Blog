@@ -46,12 +46,12 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Add time stamp to comments
 * Allows you to add friends
 * Setting a blog post to be seen by: myself, friends or everyone
 
 ### Minor updates
 * Deleting and editing Posts and Comments - only the ones written by you
+* Add time stamp to comments
 * Private messaging function
 * Add API token authentication
 * More robust User authentication system
