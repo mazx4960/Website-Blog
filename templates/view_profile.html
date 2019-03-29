@@ -25,19 +25,19 @@
     <h1 class="display-4">@{{ user['username'] }}'s Profile</h1><br>
 
     <p class="lead">Displaying {{ user['username'] }}'s Posts</p>
-    {% for post in posts %}
-      <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
-        <div class="card" style="height: 70px;">
-          <div class="card-body">
+    <ul class="list-group">
+      {% for post in posts %}
+        <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
+          <li class="list-group-item">
             {% if post['post']|length > 50: %}
-              <h5 class="title">{{ post['post'][:50] }}...</h5>
+              <span class="title">{{ post['post'][:50] }}...</span>
             {% else: %}
-              <h5 class="title">{{ post['post'] }}</h5>
+              <span class="title">{{ post['post'] }}</span>
             {% endif %}
-          </div>
-        </div>
-      </a>
-    {% endfor %}
+          </li>
+        </a>
+      {% endfor %}
+    </ul>
 </div>
 
 <p><a href="{{ url_for('posts') }}">Go back</a></p>
