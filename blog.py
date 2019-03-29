@@ -29,6 +29,8 @@ COMMENTS_URL = '/comment'
 
 @app.route('/', methods=['GET','POST'])
 def sign_in():
+    # log users out of the developer app
+    session.pop('admin_id', None)
     if request.method=='POST':
         username = request.form.get('username')
         password = request.form.get('password')
