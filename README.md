@@ -51,10 +51,10 @@ Running the website
 * Display Blogs Sorted by time stamp
 * Allows you to add friends
 * Setting a blog post to be seen by: myself, friends or everyone
-* Deleting and editing Posts and Comments - only the ones written by you
-* Private messaging function
 
 ### Minor updates
+* Deleting and editing Posts and Comments - only the ones written by you
+* Private messaging function
 * Add API token authentication
 * More robust User authentication system
 
