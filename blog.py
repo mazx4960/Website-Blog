@@ -150,7 +150,7 @@ def dev_sign_in():
 
         # checking if the password matches the one provided
         if not check_password_hash(user[0]['password'], password):
-            return error()
+            return dev_error()
 
         # checking if the account is admin
         if user[0]['admin'] != 'true':
