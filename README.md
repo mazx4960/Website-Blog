@@ -2,9 +2,13 @@
 
 A simple blog website that allows you to post questions and comments on posts
 
-# Notes
+# About this project
 
-This website was designed for me to learn more about the basic functionality of flask.
+This website was designed for me to learn more about the basic functionality of flask. It started off as a simple blogging website which allows users to post questions and comments. However, over the course of this project, I learnt more than what I expected to and encountered several road blocks. However, as I got more into this project, I envision it to be greater than just a simple blogging website.
+
+In the future, this project could be expanded to become a one stop daily planner for everyone and also allows them to document all of their activities and experiences. This could serve as a one stop portal for users to do regular reflections and also plan out their daily commute and activities. 
+
+# Notes
 
 This website was created using Flask. Flask is a lightweight `WSGI`_ web application framework. It is designed
 to make getting started quick and easy, with the ability to scale up to
@@ -37,14 +41,22 @@ Running the website
 * User Authentication (Basic Implementation)
 * SQL database to store all the user data
 * Flask to handle all the routing request
+* Server side data implemented using RESTful API
 
 # Future enhancements
 
-* Add API token authentication
+## Priority updates
+* Admin login dashboard to see all the users and activities 
+* Allows you to view user profile and adding friends
+* Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
 * Private messaging function
-* Allows you to view user profile
+
+## Minor updates
+* Add API token authentication
 * More robust User authentication system
+
+## Completed updates
 * Implementation of emails
     * notify you when you have registered for an account (done)   
     * reset your password if you have forgotten it
