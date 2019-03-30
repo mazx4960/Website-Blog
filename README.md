@@ -46,6 +46,7 @@ Running the website
 # Future enhancements
 
 ### Priority updates
+* Tidy up the code using blueprints
 * Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
 * Adding google calendar API support to pull data about your daily schedule
