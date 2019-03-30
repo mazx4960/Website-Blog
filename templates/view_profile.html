@@ -22,7 +22,20 @@
 </nav>
 
 <div class="jumbotron">
-    <h1 class="display-4">@{{ user['username'] }}'s Profile</h1><br>
+    <h1 class="display-4">@{{ user['username'] }}'s Profile &nbsp;&nbsp;
+
+      {% if user['user_id'] == session['user_id'] %}
+        <a></a>
+      {% elif status == 'pending'  %}
+        <a href="{{url_for('accept_friend',friend_id=friend_id)}}"class="btn btn-primary">Accept Request</a>
+      {% elif status == 'sent'  %}
+        <a href="#"class="btn btn-primary">Sent Request</a>
+      {% elif status == 'accepted' %}
+        <a href="#"class="btn btn-primary">Friends</a>
+      {% else %}
+        <a href="{{url_for('add_friend', friend_id=user['user_id'])}}" class="btn btn-primary">Add Friend</a>
+      {% endif %}
+    </h1><br>
 
     <p class="lead">Displaying {{ user['username'] }}'s Posts</p>
     <ul class="list-group">

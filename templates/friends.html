@@ -23,13 +23,10 @@
 </nav>
 
 <div class="jumbotron">
-    <h1 class="display-4">Welcome back, {{ users[session['user_id']] }}</h1><br>
+    <h1 class="display-4">Welcome, {{ users[session['user_id']] }}</h1><br>
 
-    <p class="lead">Pending Friend Requests: </p>
+    <p class="lead">All Friend Requests: </p>
     <ul class="list-group">
-      {% if pending_req == [] %}
-        <h5><small><i>-- No Pending Friend Requests at the moment...</i></small></h5>
-      {% endif %}
       {% for friend_id in pending_req %}
         <a href="{{ url_for('view_profile', user_id=friend_id) }}">
           <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -43,34 +40,39 @@
         </a>
       {% endfor %}
     </ul><br>
-    <p><a href="{{url_for('friends')}}" class="btn btn-secondary">View all friends</a></p>
 
-    <h2>Add a Post</h2>
-    <form action="{{ url_for('add_post') }}" method="POST">
-        <div class="input-group my-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Question:</span>
-            </div>
-            <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">submit</button>
-    </form>
-
-    <br>
-    <p class="lead">Displaying Today's Blog Posts</p>
     <ul class="list-group">
-      {% for post in user_posts %}
-        <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
-          <li class="list-group-item">
-            {% if post['post']|length > 50: %}
-              <span class="title">{{ post['post'][:50] }}...</span>
+      {% for friend_id in sent_req %}
+        <a href="{{ url_for('view_profile', user_id=friend_id) }}">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {% if users[friend_id]|length > 50: %}
+              <span class="title">{{ users[friend_id][:50] }}...</span>
             {% else: %}
-              <span class="title">{{ post['post'] }}</span>
+              <span class="title">{{ users[friend_id] }}</span>
             {% endif %}
+            <a href="#" class="badge badge-primary badge-pill">Sent Request</a>
           </li>
         </a>
       {% endfor %}
-    </ul>
+    </ul><br>
+
+    <ul class="list-group">
+      {% for friend_id in accepted_req %}
+        <a href="{{ url_for('view_profile', user_id=friend_id) }}">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {% if users[friend_id]|length > 50: %}
+              <span class="title">{{ users[friend_id][:50] }}...</span>
+            {% else: %}
+              <span class="title">{{ users[friend_id] }}</span>
+            {% endif %}
+            <a href="#" class="badge badge-primary badge-pill">Friends</a>
+          </li>
+        </a>
+      {% endfor %}
+    </ul><br>
+
 </div>
+
+<p><a href="{{ url_for('home') }}">Go back</a></p>
 
 {% endblock %}

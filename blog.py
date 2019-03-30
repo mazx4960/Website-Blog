@@ -17,11 +17,12 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
-BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
-# BASE_URL = 'http://127.0.0.1:8080'
+# BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
+BASE_URL = 'http://127.0.0.1:8080'
 USERS_URL = '/user'
 BLOGS_URL = '/blog'
 COMMENTS_URL = '/comment'
+FRIENDSHIPS_URL = '/friendship'
 
 
 ########################### User login page ###########################
@@ -261,16 +262,26 @@ def home():
     if 'user_id' not in session:
         return render_template('sign_in.html')
 
-    # getting user details
-    user_id = session['user_id']
-    parameters = {'user_id':user_id}
-    response = requests.get(BASE_URL + USERS_URL,params=parameters)
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
 
-    user = json.loads(response.json())
-    username = user[0]['username']
+    friends = json.loads(response.json())
+    pending_req = []
+    for friend in friends.keys():
+        if friends[friend] == 'pending':
+            pending_req.append(int(friend))
+
+    # getting user details
+    response = requests.get(BASE_URL + USERS_URL)
+
+    users_data = json.loads(response.json())
+    users = {}
+    for user_data in users_data:
+        users[user_data['user_id']] = user_data['username']
 
     # getting all the blogs posted by the current user
-    response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
+    response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':session['user_id']})
     data = json.loads(response.json())
 
     user_posts = []
@@ -279,7 +290,56 @@ def home():
         if post['timestamp'][:10] == timestamp:
             user_posts.append(post)
 
-    return render_template('home.html', user_posts=user_posts, username=username)
+    return render_template('home.html', session=session, user_posts=user_posts, users=users, pending_req=pending_req)
+
+@app.route('/friends')
+def friends():
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    friends = json.loads(response.json())
+    pending_req = []
+    sent_req = []
+    accepted_req = []
+    for friend in friends.keys():
+        if friends[friend] == 'pending':
+            pending_req.append(int(friend))
+        elif friends[friend] == 'sent':
+            sent_req.append(int(friend))
+        elif friends[friend] == 'accepted':
+            accepted_req.append(int(friend))
+
+    # getting user details
+    response = requests.get(BASE_URL + USERS_URL)
+
+    users_data = json.loads(response.json())
+    users = {}
+    for user_data in users_data:
+        users[user_data['user_id']] = user_data['username']
+
+    return render_template('friends.html', session=session,pending_req=pending_req,sent_req = sent_req, accepted_req=accepted_req, users=users)
+
+@app.route('/accept_friend/<int:friend_id>')
+def accept_friend(friend_id):
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # getting the users friend list
+    parameters = {
+        'user_id':session['user_id'],
+        'friend_id':friend_id,
+        'status':'accepted'
+    }
+    response = requests.put(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    if response.status_code == 404:
+        return error()
+
+    return friends()
 
 @app.route('/myposts')
 def myposts():
@@ -376,14 +436,24 @@ def view_profile(user_id):
     users = json.loads(response.json())
     user = users[0]
 
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    friends = json.loads(response.json())
+    if str(user_id) in friends.keys():
+        status = friends[str(user_id)]
+    else:
+        status = None
+
     # getting the specific blog data
     response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
     posts = json.loads(response.json())
 
-    return render_template('view_profile.html', posts=posts, user=user)
+    return render_template('view_profile.html', status=status, posts=posts, user=user, session=session)
 
 
-########################### Adding comments or post ###########################
+######################## Adding comments or post or friends ########################
 
 
 @app.route('/add_post/', methods=['POST'])
@@ -426,6 +496,26 @@ def add_comment(blog_id):
         return error()
 
     return view_post(blog_id)
+
+@app.route('/add_friend/<int:friend_id>/')
+def add_friend(friend_id):
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # storing the user id and the username in a dictionary
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    parameters = {
+        'user_id':session['user_id'] ,
+        'friend_id':friend_id,
+        'timestamp':timestamp,
+        'status':'pending'
+        }
+    response = requests.post(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    if response.status_code == 400:
+        return error()
+
+    return view_profile(friend_id)
 
 
 ########################### End of file ###########################
