@@ -46,17 +46,21 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Allows you to add friends
 * Setting a blog post to be seen by: myself, friends or everyone
+* Deleting and editing Posts and Comments - only the ones written by you
+* Adding google calendar API support to pull data about your daily schedule
+* Display day scehdule on home page 
+* Updating the current location based on current time
+* Tagging the blog post to the location
 
 ### Minor updates
-* Deleting and editing Posts and Comments - only the ones written by you
 * Add time stamp to comments
 * Private messaging function
 * Add API token authentication
 * More robust User authentication system
 
 ### Completed updates
+* Allows you to add friends (done)
 * Adding a new tab to the nav bar : (Today/Home, My Posts) replacing Home (done)
 * Add time stamp to the blogs (done)
 * Allows you to view user profile (done)
