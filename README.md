@@ -53,6 +53,7 @@ Running the website
 * Display day scehdule on home page 
 * Updating the current location based on current time
 * Tagging the blog post to the location
+* Change the home page interface: displaying only the daily schedule and adding new post while collapsing the posts today as well as the notifications
 
 ### Minor updates
 * Add time stamp to comments
