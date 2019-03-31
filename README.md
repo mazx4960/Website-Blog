@@ -46,7 +46,6 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Allow the searching of users
 * Tidy up the code using blueprints
 * Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
@@ -62,6 +61,7 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Allow the searching of users
 * Added collapsible navigation bar
 * Allows you to add friends (done)
 * Adding a new tab to the nav bar : (Today/Home, My Posts) replacing Home (done)
