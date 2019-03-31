@@ -1,23 +1,29 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<nav class="navbar fixed-top navbar-light bg-light">
+<nav class="navbar fixed-top navbar-light bg-light navbar-expand-md">
   <div class="container">
     <a class="navbar-brand" href="#"><h3>All Blog Posts</h3></a>
-    <ul class="nav nav-pills">
-      <li class="nav-item">
-        <a class="nav-link" href="/home">Today</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/myposts">My Posts</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" href="/posts">View all posts</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/log_out">Log Out</a>
-      </li>
-    </ul>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="myNavBar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="myNavBar">
+      <ul class="nav nav-pills">
+        <li class="nav-item">
+          <a class="nav-link" href="/home">Today</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/myposts">My Posts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/posts">View all posts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/log_out">Log Out</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 
