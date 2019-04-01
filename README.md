@@ -53,6 +53,7 @@ Running the website
 * Wall page to allow other users to post 
 
 ### Minor updates
+* Fix the google API OAuth error
 * Tidy up the code using blueprints
 * Add time stamp to comments
 * Private messaging function
