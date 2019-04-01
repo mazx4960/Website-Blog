@@ -48,8 +48,6 @@ Running the website
 ### Priority updates
 * Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
-* Adding google calendar API support to pull data about your daily schedule
-* Display day scehdule on home page 
 * Updating the current location based on current time
 * Tagging the blog post to the location
 
@@ -61,6 +59,8 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Adding google calendar API support to pull data about your daily schedule
+* Display day scehdule on home page 
 * Change the home page interface: displaying only the daily schedule and adding new post while collapsing the posts today as well as the notifications
 * Allow the searching of users
 * Added collapsible navigation bar
