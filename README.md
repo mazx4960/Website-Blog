@@ -46,8 +46,6 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Separating Blog title and Blog Content
-* Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
 * Allow you to add events to google calendar
 * Updating the current location based on current time
@@ -62,6 +60,8 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Separating Blog title and Blog Content
+* Setting a blog post to be seen by: myself, friends or everyone
 * Adding google calendar API support to pull data about your daily schedule
 * Display day scehdule on home page 
 * Change the home page interface: displaying only the daily schedule and adding new post while collapsing the posts today as well as the notifications
