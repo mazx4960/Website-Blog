@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<nav class="navbar fixed-top navbar-light bg-light navbar-expand-md">
+<nav class="navbar fixed-top navbar-light bg-light navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" href="#"><h3>Your Blog Posts</h3></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavBar" aria-controls="myNavBar" aria-expanded="false" aria-label="Toggle navigation">
@@ -10,7 +10,15 @@
     </button>
 
     <div class="collapse navbar-collapse" id="myNavBar">
-      <ul class="nav nav-pills ml-auto">
+
+      <form class="form-inline ml-auto" action="{{ url_for('search_results') }}" method="POST">
+        <div class="md-form my-0">
+          <input name="search_text" class="form-control" type="text" placeholder="Search users" aria-label="Search">
+          <i class="fas fa-search text-white ml-3" aria-hidden="true"></i>
+        </div>
+      </form>
+
+      <ul class="nav nav-pills">
         <li class="nav-item">
           <a class="nav-link active" href="/home">Today</a>
         </li>
@@ -32,27 +40,76 @@
 <div class="jumbotron">
     <h1 class="display-4">Welcome back, {{ users[session['user_id']] }}</h1><br>
 
-    <p class="lead">Pending Friend Requests: </p>
-    <ul class="list-group">
-      {% if pending_req == [] %}
-        <h5><small><i>-- No Pending Friend Requests at the moment...</i></small></h5>
-      {% endif %}
-      {% for friend_id in pending_req %}
-        <a href="{{ url_for('view_profile', user_id=friend_id) }}">
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            {% if users[friend_id]|length > 50: %}
-              <span class="title">{{ users[friend_id][:50] }}...</span>
-            {% else: %}
-              <span class="title">{{ users[friend_id] }}</span>
-            {% endif %}
-            <a href="{{url_for('accept_friend',friend_id=friend_id)}}" class="badge badge-primary badge-pill">Accept Request</a>
-          </li>
-        </a>
-      {% endfor %}
-    </ul><br>
-    <p><a href="{{url_for('friends')}}" class="btn btn-secondary">View all friends</a></p>
+    <div class="panel-group" id="accordion">
 
-    <h2>Add a Post</h2>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+            <h3>Friends</h3></a>
+          </h4>
+        </div>
+
+        <div id="collapse1" class="panel-collapse collapse in">
+          <div class="panel-body">
+            <p class="lead">Pending Friend Requests: </p>
+            <ul class="list-group">
+              {% if pending_req == [] %}
+                <h5><small><i>-- No Pending Friend Requests at the moment...</i></small></h5>
+              {% endif %}
+              {% for friend_id in pending_req %}
+                <a href="{{ url_for('view_profile', user_id=friend_id) }}">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {% if users[friend_id]|length > 50: %}
+                      <span class="title">{{ users[friend_id][:50] }}...</span>
+                    {% else: %}
+                      <span class="title">{{ users[friend_id] }}</span>
+                    {% endif %}
+                    <a href="{{url_for('accept_friend',friend_id=friend_id)}}" class="badge badge-primary badge-pill">Accept Request</a>
+                  </li>
+                </a>
+              {% endfor %}
+            </ul><br>
+            <p><a href="{{url_for('friends')}}" class="btn btn-secondary">View all friends</a></p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+            <h3>Today's Blog posts</h3></a>
+          </h4>
+        </div>
+
+        <div id="collapse2" class="panel-collapse collapse">
+          <div class="panel-body">
+            <br>
+            <p class="lead">Displaying Today's Blog Posts:</p>
+            <ul class="list-group">
+              {% for post in user_posts %}
+                <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
+                  <li class="list-group-item">
+                    {% if post['post']|length > 50: %}
+                      <span class="title">{{ post['post'][:50] }}...</span>
+                    {% else: %}
+                      <span class="title">{{ post['post'] }}</span>
+                    {% endif %}
+                  </li>
+                </a>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <br>
+    <h3>Add a Post</h3>
     <form action="{{ url_for('add_post') }}" method="POST">
         <div class="input-group my-3">
             <div class="input-group-prepend">
@@ -63,21 +120,6 @@
         <button type="submit" class="btn btn-primary">submit</button>
     </form>
 
-    <br>
-    <p class="lead">Displaying Today's Blog Posts</p>
-    <ul class="list-group">
-      {% for post in user_posts %}
-        <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
-          <li class="list-group-item">
-            {% if post['post']|length > 50: %}
-              <span class="title">{{ post['post'][:50] }}...</span>
-            {% else: %}
-              <span class="title">{{ post['post'] }}</span>
-            {% endif %}
-          </li>
-        </a>
-      {% endfor %}
-    </ul>
 </div>
 
 {% endblock %}

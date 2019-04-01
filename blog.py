@@ -292,55 +292,6 @@ def home():
 
     return render_template('home.html', session=session, user_posts=user_posts, users=users, pending_req=pending_req)
 
-@app.route('/friends')
-def friends():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
-
-    # getting the users friend list
-    parameters = { 'user_id':session['user_id'] }
-    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
-
-    friends = json.loads(response.json())
-    pending_req = []
-    sent_req = []
-    accepted_req = []
-    for friend in friends.keys():
-        if friends[friend] == 'pending':
-            pending_req.append(int(friend))
-        elif friends[friend] == 'sent':
-            sent_req.append(int(friend))
-        elif friends[friend] == 'accepted':
-            accepted_req.append(int(friend))
-
-    # getting user details
-    response = requests.get(BASE_URL + USERS_URL)
-
-    users_data = json.loads(response.json())
-    users = {}
-    for user_data in users_data:
-        users[user_data['user_id']] = user_data['username']
-
-    return render_template('friends.html', session=session,pending_req=pending_req,sent_req = sent_req, accepted_req=accepted_req, users=users)
-
-@app.route('/accept_friend/<int:friend_id>')
-def accept_friend(friend_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
-
-    # getting the users friend list
-    parameters = {
-        'user_id':session['user_id'],
-        'friend_id':friend_id,
-        'status':'accepted'
-    }
-    response = requests.put(BASE_URL + FRIENDSHIPS_URL, params=parameters)
-
-    if response.status_code == 404:
-        return error()
-
-    return friends()
-
 @app.route('/myposts')
 def myposts():
     if 'user_id' not in session:
@@ -451,6 +402,89 @@ def view_profile(user_id):
     posts = json.loads(response.json())
 
     return render_template('view_profile.html', status=status, posts=posts, user=user, session=session)
+
+
+######################## Getting friends list ########################
+
+
+@app.route('/friends')
+def friends():
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    friends = json.loads(response.json())
+    pending_req = []
+    sent_req = []
+    accepted_req = []
+    for friend in friends.keys():
+        if friends[friend] == 'pending':
+            pending_req.append(int(friend))
+        elif friends[friend] == 'sent':
+            sent_req.append(int(friend))
+        elif friends[friend] == 'accepted':
+            accepted_req.append(int(friend))
+
+    # getting user details
+    response = requests.get(BASE_URL + USERS_URL)
+
+    users_data = json.loads(response.json())
+    users = {}
+    for user_data in users_data:
+        users[user_data['user_id']] = user_data['username']
+
+    return render_template('friends.html', session=session,pending_req=pending_req,sent_req = sent_req, accepted_req=accepted_req, users=users)
+
+@app.route('/accept_friend/<int:friend_id>')
+def accept_friend(friend_id):
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    # getting the users friend list
+    parameters = {
+        'user_id':session['user_id'],
+        'friend_id':friend_id,
+        'status':'accepted'
+    }
+    response = requests.put(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    if response.status_code == 404:
+        return error()
+
+    return friends()
+
+@app.route('/search_results', methods=['POST'])
+def search_results():
+    if 'user_id' not in session:
+        return render_template('sign_in.html')
+
+    search_text = request.form.get('search_text')
+
+    # getting user details
+    response = requests.get(BASE_URL + USERS_URL)
+    users_data = json.loads(response.json())
+
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+    friends = json.loads(response.json())
+
+    # results should be in the form of {'user_id':['username','status']}
+    results = {}
+    for user_data in users_data:
+        if search_text in user_data['username']:
+            results[user_data['user_id']] = [user_data['username']]
+            if str(user_data['user_id']) in friends.keys():
+                results[user_data['user_id']].append(friends[str(user_data['user_id'])])
+            elif user_data['user_id'] == session['user_id']:
+                results[user_data['user_id']].append('current user')
+            else:
+                results[user_data['user_id']].append('strangers')
+
+    return render_template('search_results.html', results=results)
 
 
 ######################## Adding comments or post or friends ########################
