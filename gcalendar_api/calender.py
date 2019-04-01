@@ -46,7 +46,8 @@ def getEvents(user_id, period, start = datetime.utcnow().date()):
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'gcalendar_api/credentials.json', SCOPES)
-            creds = flow.run_console()
+            #creds = flow.run_console()
+            creds = flow.run_local_server()
         # Save the credentials for the next run
         with open('gcalendar_api/tokens/token_{}.pickle'.format(user_id), 'wb') as token:
             pickle.dump(creds, token)

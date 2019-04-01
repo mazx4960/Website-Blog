@@ -19,8 +19,8 @@ from gcalendar_api.calender import getEvents, timeIn12h
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
-# BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
-BASE_URL = 'http://127.0.0.1:8080'
+BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
+# BASE_URL = 'http://127.0.0.1:8080'
 USERS_URL = '/user'
 BLOGS_URL = '/blog'
 COMMENTS_URL = '/comment'
