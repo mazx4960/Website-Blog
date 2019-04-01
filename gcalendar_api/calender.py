@@ -46,8 +46,26 @@ def getEvents(user_id, period, start = datetime.utcnow().date()):
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'gcalendar_api/credentials.json', SCOPES)
+
             #creds = flow.run_console()
-            creds = flow.run_local_server()
+            #creds = flow.run_local_server()
+
+            # Indicate where the API server will redirect the user after the user completes
+            # the authorization flow. The redirect URI is required. The value must exactly
+            # match one of the authorized redirect URIs for the OAuth 2.0 client, which you
+            # configured in the API Console. If this value doesn't match an authorized URI,
+            # you will get a 'redirect_uri_mismatch' error.
+            flow.redirect_uri = 'https://pure-atoll-42532.herokuapp.com/'
+
+            # Generate URL for request to Google's OAuth 2.0 server.
+            # Use kwargs to set optional request parameters.
+            authorization_url, state = flow.authorization_url(
+                # Enable offline access so that you can refresh an access token without
+                # re-prompting the user for permission. Recommended for web server apps.
+                access_type='offline',
+                # Enable incremental authorization. Recommended as a best practice.
+                include_granted_scopes='true')
+
         # Save the credentials for the next run
         with open('gcalendar_api/tokens/token_{}.pickle'.format(user_id), 'wb') as token:
             pickle.dump(creds, token)
