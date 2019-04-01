@@ -46,8 +46,6 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Allow the searching of users
-* Tidy up the code using blueprints
 * Setting a blog post to be seen by: myself, friends or everyone
 * Deleting and editing Posts and Comments - only the ones written by you
 * Adding google calendar API support to pull data about your daily schedule
@@ -56,12 +54,15 @@ Running the website
 * Tagging the blog post to the location
 
 ### Minor updates
+* Tidy up the code using blueprints
 * Add time stamp to comments
 * Private messaging function
 * Add API token authentication
 * More robust User authentication system
 
 ### Completed updates
+* Change the home page interface: displaying only the daily schedule and adding new post while collapsing the posts today as well as the notifications
+* Allow the searching of users
 * Added collapsible navigation bar
 * Allows you to add friends (done)
 * Adding a new tab to the nav bar : (Today/Home, My Posts) replacing Home (done)
