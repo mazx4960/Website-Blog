@@ -73,7 +73,6 @@
             <p><a href="{{url_for('friends')}}" class="btn btn-secondary">View all friends</a></p>
           </div>
         </div>
-
       </div>
 
       <div class="panel panel-default">
@@ -92,34 +91,105 @@
               {% for post in user_posts %}
                 <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
                   <li class="list-group-item">
-                    {% if post['post']|length > 50: %}
-                      <span class="title">{{ post['post'][:50] }}...</span>
+                    {% if post['title']|length > 50: %}
+                      <span class="title">{{ post['title'][:50] }}...</span>
                     {% else: %}
-                      <span class="title">{{ post['post'] }}</span>
+                      <span class="title">{{ post['title'] }}</span>
                     {% endif %}
                   </li>
                 </a>
               {% endfor %}
+              <br>
             </ul>
           </div>
         </div>
+      </div>
 
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+            <h3>Schedule</h3></a>
+          </h4>
+        </div>
+
+        <div id="collapse3" class="panel-collapse collapse">
+          <div class="panel-body">
+            <br>
+            <h3>Today's Overview: </h3>
+            <ul class="list-group">
+              {% if events == [] %}
+                <h5><small><i>-- No events today...</i></small></h5>
+              {% endif %}
+              {% for event in events %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="title" style="padding-right: 10px;">{{ event['start'] }}</span>
+                    <span class="title" style="padding-right: 5px;">{{ event['summary'] }}</span>
+                  </div>
+                  <span class="title">{{ event['location'] }}</span>
+                </li>
+              {% endfor %}
+            </ul><br>
+          </div>
+        </div>
       </div>
 
     </div>
 
     <br>
-    <h3>Add a Post</h3>
+    <p class="lead float-right">Date: <span id="date"></span></p>
+
+    <h3>Share your thoughts about today</h3>
     <form action="{{ url_for('add_post') }}" method="POST">
+
         <div class="input-group my-3">
             <div class="input-group-prepend">
-                <span class="input-group-text">Question:</span>
+                <span class="input-group-text">Title:</span>
+            </div>
+            <input class="form-control" name="title" placeholder="Enter here..." maxlength="100"></input>
+        </div>
+
+        <div class="input-group my-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Content:</span>
             </div>
             <textarea class="form-control" name="post" placeholder="Enter here..." maxlength="2000"></textarea>
         </div>
+
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Set</label>
+          </div>
+          <select name="privacy" class="custom-select" id="inputGroupSelect01">
+            <option disabled selected>Who should see this</option>
+            <option value="public">Public</option>
+            <option value="friends">Friends</option>
+            <option value="myself">Only Me</option>
+          </select>
+        </div>
+
         <button type="submit" class="btn btn-primary">submit</button>
+
     </form>
 
 </div>
+
+<script>
+  function updateClock() {
+      var now = new Date(), // current date
+      months = ['January', 'February', 'March','April','May','June','July',
+                'August','September','October','November','December']; // you get the idea
+
+      // a cleaner way than string concatenation
+      date = [now.getDate(),
+              months[now.getMonth()],
+              now.getFullYear()].join(' ');
+
+      // set the content of the element with the ID time to the formatted string
+      document.getElementById('date').innerHTML = date;
+  }
+  updateClock();
+</script>
 
 {% endblock %}

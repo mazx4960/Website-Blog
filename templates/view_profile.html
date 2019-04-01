@@ -41,7 +41,7 @@
       {% if user['user_id'] == session['user_id'] %}
         <a></a>
       {% elif status == 'pending'  %}
-        <a href="{{url_for('accept_friend',friend_id=friend_id)}}"class="btn btn-primary">Accept Request</a>
+        <a href="{{url_for('accept_friend',friend_id=user['user_id'])}}"class="btn btn-primary">Accept Request</a>
       {% elif status == 'sent'  %}
         <a href="#"class="btn btn-primary">Sent Request</a>
       {% elif status == 'accepted' %}
@@ -56,10 +56,10 @@
       {% for post in posts %}
         <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
           <li class="list-group-item">
-            {% if post['post']|length > 50: %}
-              <span class="title">{{ post['post'][:50] }}...</span>
+            {% if post['title']|length > 50: %}
+              <span class="title">{{ post['title'][:50] }}...</span>
             {% else: %}
-              <span class="title">{{ post['post'] }}</span>
+              <span class="title">{{ post['title'] }}</span>
             {% endif %}
           </li>
         </a>

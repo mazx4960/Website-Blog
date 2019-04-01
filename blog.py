@@ -13,6 +13,8 @@ import json
 
 from datetime import datetime
 
+from gcalendar_api.calender import getEvents, timeIn12h
+
 # SECRETY_KET is needed in order to store sessions
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -290,7 +292,21 @@ def home():
         if post['timestamp'][:10] == timestamp:
             user_posts.append(post)
 
-    return render_template('home.html', session=session, user_posts=user_posts, users=users, pending_req=pending_req)
+    # Getting all the upcoming events for the day
+    events_data = getEvents(session['user_id'],'day')
+
+    events = []
+    for event in events_data:
+        temp = {
+            "summary"   :event['summary'],
+            "location"  :event['location'] if 'location' in event.keys() else '',
+            "start"     :timeIn12h(event['start'].get('dateTime')[11:19]),
+            "end"       :timeIn12h(event['end'].get('dateTime')[11:19])
+        }
+        events.append(temp)
+
+    return render_template('home.html', events=events, session=session,
+                    user_posts=user_posts, users=users, pending_req=pending_req)
 
 @app.route('/myposts')
 def myposts():
@@ -309,7 +325,8 @@ def myposts():
         temp = {
             'blog_id'   :post['blog_id'],
             'blogger_id':post['blogger_id'],
-            'post'      :post['post']
+            'title'     :post['title'],
+            'post'      :post['post'],
         }
         if post['timestamp'][:10] in user_posts.keys():
             user_posts[post['timestamp'][:10]].append(temp)
@@ -331,16 +348,31 @@ def posts():
     for user_data in users_data:
         users[user_data['user_id']] = user_data['username']
 
+    # getting the users friend list
+    parameters = { 'user_id':session['user_id'] }
+    response = requests.get(BASE_URL + FRIENDSHIPS_URL, params=parameters)
+
+    friends_data = json.loads(response.json())
+    friends = []
+    for friend in friends_data.keys():
+        if friends_data[friend] == 'accepted':
+            friends.append(friend)
+
     # getting all the blogs posted
     response = requests.get(BASE_URL + BLOGS_URL)
     data = json.loads(response.json())
 
     user_posts = {}
     for post in data:
+        if str(post['blogger_id']) not in friends or post['privacy'] == "myself":
+            continue
+
         temp = {
             'blog_id'   :post['blog_id'],
             'blogger_id':post['blogger_id'],
+            'title'     :post['title'],
             'post'      :post['post'],
+            'privacy'   :post['privacy'],
             'blogger'   :users[post['blogger_id']]
         }
         if post['timestamp'][:10] in user_posts.keys():
@@ -399,7 +431,21 @@ def view_profile(user_id):
 
     # getting the specific blog data
     response = requests.get(BASE_URL + BLOGS_URL,params={'blogger_id':user_id})
-    posts = json.loads(response.json())
+    data = json.loads(response.json())
+
+    posts = []
+    for post in data:
+        if str(post['blogger_id']) not in friends or post['privacy'] == "myself":
+            continue
+
+        temp = {
+            'blog_id'   :post['blog_id'],
+            'blogger_id':post['blogger_id'],
+            'title'     :post['title'],
+            'post'      :post['post'],
+            'privacy'   :post['privacy']
+        }
+        posts.append(temp)
 
     return render_template('view_profile.html', status=status, posts=posts, user=user, session=session)
 
@@ -495,15 +541,20 @@ def add_post():
     if 'user_id' not in session:
         return render_template('sign_in.html')
 
+    title = request.form.get('title')
     post = request.form.get('post')
-    if not post:
+    privacy = request.form.get('privacy')
+
+    if not title or not post or not privacy:
         return error()
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     parameters = {
         'blogger_id':session['user_id'],
+        'title':title,
         'post':post,
+        'privacy':privacy,
         'timestamp':timestamp
     }
     response = requests.post(BASE_URL + BLOGS_URL, params=parameters)

@@ -45,10 +45,10 @@
         {% for post in user_posts[timestamp] %}
           <a href="{{ url_for('view_post', blog_id=post['blog_id']) }}">
             <li class="list-group-item">
-              {% if post['post']|length > 50: %}
-                <span class="title">{{ post['post'][:50] }}...</span>
+              {% if post['title']|length > 50: %}
+                <span class="title">{{ post['title'][:50] }}...</span>
               {% else: %}
-                <span class="title">{{ post['post'] }}</span>
+                <span class="title">{{ post['title'] }}</span>
               {% endif %}
             </li>
           </a>

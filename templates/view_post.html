@@ -39,8 +39,9 @@
     <p class="lead">Displaying Blog Post</p>
     <div class="card">
       <div class="card-body">
-        <h3 class="title">{{ post['post'] }}</h3><br>
-        <h6 class="card-subtitle mb-2 text-muted">
+        <h3 class="title">{{ post['title'] }}</h3><br>
+        <h4 class="title text-muted">{{ post['post'] }}</h4><br>
+        <h6 class="card-subtitle mb-2">
           Submitted By: <a href="{{ url_for('view_profile', user_id=post['blogger_id']) }}">
             {{ post['blogger'] }}</a>
         </h6>
