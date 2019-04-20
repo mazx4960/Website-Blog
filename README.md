@@ -46,14 +46,14 @@ Running the website
 # Future enhancements
 
 ### Priority updates
+* Fix the google API OAuth error (Allow a redirect link to authenticate google account)
+* Create a google calendar event from the website
 * Deleting and editing Posts and Comments - only the ones written by you
-* Allow you to add events to google calendar
 * Updating the current location based on current time
 * Tagging the blog post to the location
 * Wall page to allow other users to post 
 
 ### Minor updates
-* Fix the google API OAuth error
 * Tidy up the code using blueprints
 * Add time stamp to comments
 * Private messaging function
