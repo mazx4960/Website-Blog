@@ -48,6 +48,8 @@ Running the website
 ### Priority updates
 * Fix the google API OAuth error (Allow a redirect link to authenticate google account)
 * Create a google calendar event from the website
+* Adding to do list (link to google keep)
+* Adding a big timer at the top to key events
 * Deleting and editing Posts and Comments - only the ones written by you
 * Updating the current location based on current time
 * Tagging the blog post to the location
