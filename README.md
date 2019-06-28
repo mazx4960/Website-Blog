@@ -47,6 +47,7 @@ Running the website
 
 ### Priority updates
 * Fix the google API OAuth error (Allow a redirect link to authenticate google account)
+* Snap the page when scrolling
 * Create a google calendar event from the website
 * Adding to do list (link to google keep)
 * Adding a big timer at the top to key events
