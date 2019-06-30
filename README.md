@@ -25,13 +25,17 @@ community that make adding new functionality easy.
 Installing
 ----------
 
-Install and update using `pip`_:
+Installing required packages using `pip`_:
 
-    pip install -U Flask
+    pip install -r requirements.txt
     
-Running the website
+Or, running in virtualenv:
 
     cd <path to the app directory>
+    source env/bin/activate
+    
+Running the website:
+
     export FLASK_APP=blog.py
     flask run
     
