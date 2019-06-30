@@ -46,7 +46,6 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Fix the google API OAuth error (Allow a redirect link to authenticate google account)
 * Snap the page when scrolling
 * Create a google calendar event from the website
 * Adding to do list (link to google keep)
@@ -64,6 +63,7 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Fix the google API OAuth error (Allow a redirect link to authenticate google account)
 * Separating Blog title and Blog Content
 * Setting a blog post to be seen by: myself, friends or everyone
 * Adding google calendar API support to pull data about your daily schedule
