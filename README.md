@@ -50,6 +50,8 @@ Running the website:
 # Future enhancements
 
 ### Priority updates
+* Reorganisation of flask app 
+* Configure API to only accept request from this site
 * Persistent data storage for google credentials & Tagging of credentials to one user
 * Snap the page when scrolling
 * Create a google calendar event from the website
