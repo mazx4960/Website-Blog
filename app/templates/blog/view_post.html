@@ -10,7 +10,7 @@
 
     <div class="collapse navbar-collapse" id="myNavBar">
 
-      <form class="form-inline ml-auto" action="{{ url_for('search_results') }}" method="POST">
+      <form class="form-inline ml-auto" action="{{ url_for('blog.search_results') }}" method="POST">
         <div class="md-form my-0">
           <input name="search_text" class="form-control" type="text" placeholder="Search users" aria-label="Search">
           <i class="fas fa-search text-white ml-3" aria-hidden="true"></i>
@@ -42,7 +42,7 @@
         <h3 class="title">{{ post['title'] }}</h3><br>
         <h4 class="title text-muted">{{ post['post'] }}</h4><br>
         <h6 class="card-subtitle mb-2">
-          Submitted By: <a href="{{ url_for('view_profile', user_id=post['blogger_id']) }}">
+          Submitted By: <a href="{{ url_for('blog.view_profile', user_id=post['blogger_id']) }}">
             {{ post['blogger'] }}</a>
         </h6>
       </div>
@@ -51,7 +51,7 @@
 
     <br>
     <h2>Add a Comment</h2>
-    <form action="{{ url_for('add_comment', blog_id=post['blog_id']) }}" method="POST">
+    <form action="{{ url_for('blog.add_comment', blog_id=post['blog_id']) }}" method="POST">
         <div class="input-group my-3">
             <span class="input-group-text">User:</span>
             <input type="text" class="form-control" placeholder={{ users[session['user_id']] }} readonly>
@@ -68,7 +68,7 @@
     {% for comment in comments %}
         <div class="card">
           <div class="card-body">
-            <a href="{{ url_for('view_profile', user_id=comment['user_id']) }}">
+            <a href="{{ url_for('blog.view_profile', user_id=comment['user_id']) }}">
               <h5 class="title">@{{ users[comment['user_id']] }}</h5>
             </a>
             <h4 class="card-subtitle mb-2 text-muted">{{ comment['comment'] }}</h4>
@@ -77,7 +77,7 @@
     {% endfor %}
 </div>
 
-<p><a href="{{ url_for('posts') }}">Go back</a></p>
+<p><a href="{{ url_for('blog.posts') }}">Go back</a></p>
 
 
 {% endblock %}

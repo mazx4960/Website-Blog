@@ -11,7 +11,7 @@
 
     <div class="collapse navbar-collapse" id="myNavBar">
 
-      <form class="form-inline ml-auto" action="{{ url_for('search_results') }}" method="POST">
+      <form class="form-inline ml-auto" action="{{ url_for('blog.search_results') }}" method="POST">
         <div class="md-form my-0">
           <input name="search_text" class="form-control" type="text" placeholder="Search users" aria-label="Search">
           <i class="fas fa-search text-white ml-3" aria-hidden="true"></i>
@@ -44,7 +44,7 @@
     <p class="lead">Displaying Search Results</p>
     <ul class="list-group">
       {% for user_id in results.keys() %}
-        <a href="{{ url_for('view_profile', user_id=user_id) }}">
+        <a href="{{ url_for('blog.view_profile', user_id=user_id) }}">
           <li class="list-group-item d-flex justify-content-between align-items-center">
             {% if results[user_id][0]|length > 50 %}
               <span class="title">{{ results[user_id][0][:50] }}...</span>
@@ -55,13 +55,13 @@
             {% if results[user_id][1] == 'current user' %}
               <a href="#"class="badge badge-primary badge-pill">You</a>
             {% elif results[user_id][1] == 'pending'  %}
-              <a href="{{url_for('accept_friend',friend_id=user_id)}}" class="badge badge-primary badge-pill">Accept Request</a>
+              <a href="{{url_for('blog.accept_friend',friend_id=user_id)}}" class="badge badge-primary badge-pill">Accept Request</a>
             {% elif results[user_id][1] == 'sent'  %}
               <a href="#"class="badge badge-primary badge-pill">Sent Request</a>
             {% elif results[user_id][1] == 'accepted' %}
               <a href="#"class="badge badge-primary badge-pill">Friends</a>
             {% elif results[user_id][1] == 'strangers' %}
-              <a href="{{url_for('add_friend', friend_id=user_id)}}" class="badge badge-primary badge-pill">Add Friend</a>
+              <a href="{{url_for('blog.add_friend', friend_id=user_id)}}" class="badge badge-primary badge-pill">Add Friend</a>
             {% endif %}
 
           </li>

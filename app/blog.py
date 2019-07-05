@@ -1,5 +1,6 @@
-from flask import Flask, request, render_template, redirect, url_for
-
+from flask import (
+    Blueprint, Flask, request, render_template, redirect, url_for
+)
 # sessions is built on top of cookies
 # which is sent to the server the authenticate the user
 from flask import session
@@ -17,12 +18,9 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 
-# for testing purposes
-import os
+from app.auth import login_required, sign_in, error
 
-# SECRETY_KET is needed in order to store sessions
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'thisisasecretkey'
+bp = Blueprint('blog',__name__)
 
 # BASE_URL = 'https://pure-atoll-42532.herokuapp.com'
 BASE_URL = 'http://127.0.0.1:8080'
@@ -33,7 +31,7 @@ FRIENDSHIPS_URL = '/friendship'
 
 # This variable specifies the name of a file that contains the OAuth 2.0
 # information for this application, including its client_id and client_secret.
-CLIENT_SECRETS_FILE = "client_secret.json"
+CLIENT_SECRETS_FILE = "app/client_secret.json"
 
 # This OAuth 2.0 access scope allows for full read/write access to the
 # authenticated user's account and requires requests to use an SSL connection.
@@ -44,237 +42,8 @@ SCOPES = ['openid','https://www.googleapis.com/auth/calendar.readonly',\
 API_SERVICE_NAME = 'calendar'
 API_VERSION = 'v3'
 
-########################### User login page ###########################
-
-
-@app.route('/', methods=['GET','POST'])
-def sign_in():
-    # log users out of the developer app
-    session.pop('admin_id', None)
-    if request.method=='POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        # checking if the fields are empty
-        if not username or not password:
-            return error()
-
-        # checking if the username exists in the database
-        parameters = { 'username': username }
-        response = requests.get(BASE_URL + USERS_URL,params=parameters)
-
-        if response.status_code == 404:
-            return error()
-
-        user = json.loads(response.json())
-
-        # checking if the password matches the one provided
-        if not check_password_hash(user[0]['password'], password):
-            return error()
-
-        # all tests passed, adding the user_id to the session
-        session['user_id'] = user[0]['user_id']
-        return redirect(url_for('home'))
-
-    else:
-        return render_template('sign_in.html')
-
-@app.route('/sign_up/', methods=['GET','POST'])
-def sign_up():
-    if request.method=='POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        recipient_email = request.form.get('email')
-
-        # checking if the field is null
-        if not username or not password or not recipient_email:
-            return error()
-
-        hashed_password = generate_password_hash(password)
-        parameters = {
-            'username':username,
-            'password':hashed_password,
-            'email':recipient_email,
-            'admin':'false'
-        }
-        response = requests.post(BASE_URL + USERS_URL,params=parameters)
-
-        # Checking if the user has registered before
-        if response.status_code == 400:
-            return error()
-
-        # getting the user_id of the new user
-        parameters = {'username':username}
-        response = requests.get(BASE_URL + USERS_URL,params=parameters)
-
-        # adding the user_id to the session
-        user = json.loads(response.json())
-        session['user_id'] = user[0]['user_id']
-
-        # sending the confirmation email in the background thread
-        msg = "You have been registered successfully!\n"
-        msg += "Username: {0}\nPassword: {1}\n".format(username,password)
-
-        thread = threading.Thread(target=sendEmail, args=(recipient_email,msg))
-        thread.daemon = True
-        thread.start()
-
-        return redirect(url_for('home'))
-    else:
-        return render_template('sign_up.html')
-
-def sendEmail(recipient_email, msg):
-    sender_email = "noreply9874321@gmail.com"
-    #password = input("Enter your password: ")
-    password = "qazwsx!@#123"
-
-    server = smtplib.SMTP('smtp.gmail.com',587)
-    server.ehlo()
-    server.starttls()
-    # Ensure that you have enabled less secure app access in your email account
-    server.login(sender_email,password)
-    server.sendmail(sender_email,recipient_email,msg)
-    server.quit()
-
-@app.route('/log_out/')
-def log_out():
-    session.pop('user_id', None)
-    return sign_in()
-
-
-########################### Admin dashboard ###########################
-
-
-@app.route('/developer/', methods=['GET','POST'])
-def dev_sign_in():
-    # log users out of the main app
-    session.pop('user_id', None)
-
-    if 'admin_id' in session:
-        return dev_dashboard()
-
-    if request.method=='POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        # checking if the fields are empty
-        if not username or not password:
-            return dev_error()
-
-        # checking if the username exists in the database
-        parameters = { 'username': username }
-        response = requests.get(BASE_URL + USERS_URL,params=parameters)
-
-        if response.status_code == 404:
-            return dev_error()
-
-        user = json.loads(response.json())
-
-        # checking if the password matches the one provided
-        if not check_password_hash(user[0]['password'], password):
-            return dev_error()
-
-        # checking if the account is admin
-        if user[0]['admin'] != 'true':
-            return dev_error()
-
-        # all tests passed, adding the user_id to the session
-        session['admin_id'] = user[0]['user_id']
-        return redirect(url_for('dev_dashboard'))
-
-    else:
-        return render_template('dev_sign_in.html')
-
-@app.route('/developer/sign_up/', methods=['GET','POST'])
-def dev_sign_up():
-    if request.method=='POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        recipient_email = request.form.get('email')
-
-        # checking if the field is null
-        if not username or not password or not recipient_email:
-            return dev_error()
-
-        # Checking if the user has registered before
-        hashed_password = generate_password_hash(password)
-        parameters = {
-            'username':username,
-            'password':hashed_password,
-            'email':recipient_email,
-            'admin':'pending'
-        }
-        response = requests.post(BASE_URL + USERS_URL,params=parameters)
-
-        if response.status_code == 400:
-            return dev_error()
-
-        return render_template('dev_sign_in.html')
-    else:
-        return render_template('dev_sign_up.html')
-
-@app.route('/developer/home/')
-def dev_dashboard():
-    if 'admin_id' not in session:
-        return render_template('dev_sign_in.html')
-
-    # get all data
-    response = requests.get(BASE_URL + USERS_URL)
-    users = json.loads(response.json())
-
-    usernames = {}
-    for user in users:
-        usernames[user['user_id']] = user['username']
-
-    response = requests.get(BASE_URL + BLOGS_URL)
-    user_posts = json.loads(response.json())
-
-    return render_template('dashboard.html', users=users, user_posts=user_posts, usernames=usernames)
-
-@app.route('/developer/promote/<int:user_id>')
-def dev_promote(user_id):
-    if 'admin_id' not in session:
-        return render_template('dev_sign_in.html')
-
-    parameters = {'user_id':user_id, 'admin':'true'}
-    response = requests.put(BASE_URL + USERS_URL, params=parameters)
-    return dev_dashboard()
-
-@app.route('/developer/demote/<int:user_id>')
-def dev_demote(user_id):
-    if 'admin_id' not in session:
-        return render_template('dev_sign_in.html')
-
-    parameters = {'user_id':user_id, 'admin':'false'}
-    response = requests.put(BASE_URL + USERS_URL, params=parameters)
-    return dev_dashboard()
-
-@app.route('/developer/delete/<int:user_id>')
-def dev_delete_user(user_id):
-    if 'admin_id' not in session:
-        return render_template('dev_sign_in.html')
-
-    parameters = {'user_id':user_id}
-    response = requests.delete(BASE_URL + USERS_URL, params=parameters)
-    return dev_dashboard()
-
-@app.route('/developer/log_out/')
-def dev_log_out():
-    session.pop('admin_id', None)
-    return dev_sign_in()
-
-@app.route('/developer/error/')
-def dev_error():
-    return render_template('dev_error.html')
-
 
 ########################### Blog home pages ###########################
-
-
-# Handles all the exception cases
-@app.route('/error/')
-def error():
-    return render_template('error.html')
 
 # time convertion function for home page
 def timeIn12h(time):
@@ -295,10 +64,9 @@ def credentials_to_dict(credentials):
           'client_secret': credentials.client_secret,
           'scopes': credentials.scopes}
 
-@app.route('/home')
+@bp.route('/home')
+@login_required
 def home():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # getting the users friend list
     parameters = { 'user_id':session['user_id'] }
@@ -363,10 +131,11 @@ def home():
         #              credentials in a persistent database instead.
         session['credentials'] = credentials_to_dict(credentials)
 
-    return render_template('home.html', events=events, session=session,
+    return render_template('blog/home.html', events=events, session=session,
                     user_posts=user_posts, users=users, pending_req=pending_req)
 
-@app.route('/authorize')
+@bp.route('/authorize')
+@login_required
 def authorize():
     # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
@@ -376,7 +145,7 @@ def authorize():
     # for the OAuth 2.0 client, which you configured in the API Console. If this
     # value doesn't match an authorized URI, you will get a 'redirect_uri_mismatch'
     # error.
-    flow.redirect_uri = url_for('oauth2callback', _external=True)
+    flow.redirect_uri = url_for('blog.oauth2callback', _external=True)
 
     authorization_url, state = flow.authorization_url(
       # Enable offline access so that you can refresh an access token without
@@ -391,7 +160,8 @@ def authorize():
 
     return redirect(authorization_url)
 
-@app.route('/oauth2callback')
+@bp.route('/oauth2callback')
+@login_required
 def oauth2callback():
     # Specify the state when creating the flow in the callback so that it can
     # verified in the authorization server response.
@@ -399,7 +169,7 @@ def oauth2callback():
 
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
       CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
-    flow.redirect_uri = url_for('oauth2callback', _external=True)
+    flow.redirect_uri = url_for('blog.oauth2callback', _external=True)
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = request.url
@@ -411,9 +181,10 @@ def oauth2callback():
     credentials = flow.credentials
     session['credentials'] = credentials_to_dict(credentials)
 
-    return redirect(url_for('home'))
+    return redirect(url_for('blog.home'))
 
-@app.route('/revoke')
+@bp.route('/revoke')
+@login_required
 def revoke():
     if 'credentials' not in session:
         return redirect(url_for('error'))
@@ -428,20 +199,20 @@ def revoke():
     status_code = getattr(revoke, 'status_code')
     if status_code == 200:
         clear_credentials()
-        return redirect(url_for('home'))
+        return redirect(url_for('blog.home'))
     else:
-        return redirect(url_for('error'))
+        return redirect(url_for('auth.error'))
 
-@app.route('/clear')
+@bp.route('/clear')
+@login_required
 def clear_credentials():
     if 'credentials' in session:
         session.pop('credentials',None)
-    return redirect(url_for('home'))
+    return redirect(url_for('blog.home'))
 
-@app.route('/myposts')
+@bp.route('/myposts')
+@login_required
 def myposts():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # getting user details
     user_id = session['user_id']
@@ -463,12 +234,11 @@ def myposts():
         else:
             user_posts[post['timestamp'][:10]] = [temp]
 
-    return render_template('myposts.html', user_posts=user_posts)
+    return render_template('blog/myposts.html', user_posts=user_posts)
 
-@app.route('/posts')
+@bp.route('/posts')
+@login_required
 def posts():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # storing the user id and the username in a dictionary
     response = requests.get(BASE_URL + USERS_URL)
@@ -510,12 +280,11 @@ def posts():
         else:
             user_posts[post['timestamp'][:10]] = [temp]
 
-    return render_template('posts.html', user_posts=user_posts)
+    return render_template('blog/posts.html', user_posts=user_posts)
 
-@app.route('/view_post/<int:blog_id>/')
+@bp.route('/view_post/<int:blog_id>/')
+@login_required
 def view_post(blog_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # storing the user id and the username in a dictionary
     response = requests.get(BASE_URL + USERS_URL)
@@ -535,13 +304,12 @@ def view_post(blog_id):
     response = requests.get(BASE_URL + COMMENTS_URL + '/' + str(blog_id))
     comments = json.loads(response.json())
 
-    return render_template('view_post.html', comments=comments, post=post, \
+    return render_template('blog/view_post.html', comments=comments, post=post, \
     users=users, session=session)
 
-@app.route('/view_profile/<int:user_id>/')
+@bp.route('/view_profile/<int:user_id>/')
+@login_required
 def view_profile(user_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # storing the user id and the username in a dictionary
     parameters = { 'user_id':user_id }
@@ -577,16 +345,15 @@ def view_profile(user_id):
         }
         posts.append(temp)
 
-    return render_template('view_profile.html', status=status, posts=posts, user=user, session=session)
+    return render_template('blog/view_profile.html', status=status, posts=posts, user=user, session=session)
 
 
 ######################## Getting friends list ########################
 
 
-@app.route('/friends')
+@bp.route('/friends')
+@login_required
 def friends():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # getting the users friend list
     parameters = { 'user_id':session['user_id'] }
@@ -612,12 +379,11 @@ def friends():
     for user_data in users_data:
         users[user_data['user_id']] = user_data['username']
 
-    return render_template('friends.html', session=session,pending_req=pending_req,sent_req = sent_req, accepted_req=accepted_req, users=users)
+    return render_template('blog/friends.html', session=session,pending_req=pending_req,sent_req = sent_req, accepted_req=accepted_req, users=users)
 
-@app.route('/accept_friend/<int:friend_id>')
+@bp.route('/accept_friend/<int:friend_id>')
+@login_required
 def accept_friend(friend_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # getting the users friend list
     parameters = {
@@ -632,10 +398,9 @@ def accept_friend(friend_id):
 
     return friends()
 
-@app.route('/search_results', methods=['POST'])
+@bp.route('/search_results', methods=['POST'])
+@login_required
 def search_results():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     search_text = request.form.get('search_text')
 
@@ -660,16 +425,15 @@ def search_results():
             else:
                 results[user_data['user_id']].append('strangers')
 
-    return render_template('search_results.html', results=results)
+    return render_template('blog/search_results.html', results=results)
 
 
 ######################## Adding comments or post or friends ########################
 
 
-@app.route('/add_post/', methods=['POST'])
+@bp.route('/add_post/', methods=['POST'])
+@login_required
 def add_post():
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     title = request.form.get('title')
     post = request.form.get('post')
@@ -694,10 +458,9 @@ def add_post():
 
     return home()
 
-@app.route('/add_comment/<int:blog_id>/', methods=['POST'])
+@bp.route('/add_comment/<int:blog_id>/', methods=['POST'])
+@login_required
 def add_comment(blog_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     comment = request.form.get('comment')
     if not comment:
@@ -712,10 +475,9 @@ def add_comment(blog_id):
 
     return view_post(blog_id)
 
-@app.route('/add_friend/<int:friend_id>/')
+@bp.route('/add_friend/<int:friend_id>/')
+@login_required
 def add_friend(friend_id):
-    if 'user_id' not in session:
-        return render_template('sign_in.html')
 
     # storing the user id and the username in a dictionary
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -731,11 +493,3 @@ def add_friend(friend_id):
         return error()
 
     return view_profile(friend_id)
-
-
-########################### End of file ###########################
-
-# When running locally, disable OAuthlib's HTTPs verification.
-# ACTION ITEM for developers:
-#     When running in production *do not* leave this option enabled.
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'

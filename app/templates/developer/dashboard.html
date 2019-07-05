@@ -32,13 +32,13 @@
           <span class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</span>
         {% elif user['admin'] == 'pending' or user['admin'] == 'false' %}
           <div>
-            <a href="{{ url_for('dev_delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
-            <a href="{{ url_for('dev_promote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+            <a href="{{ url_for('developer.delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
+            <a href="{{ url_for('developer.promote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
           </div>
         {% elif user['admin'] == 'true' %}
           <div>
-            <a href="{{ url_for('dev_delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
-            <a href="{{ url_for('dev_demote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
+            <a href="{{ url_for('developer.delete_user', user_id=user['user_id'])}}" class="badge badge-danger badge-pill">Delete</a>
+            <a href="{{ url_for('developer.demote', user_id=user['user_id'])}}" class="badge badge-primary badge-pill">Admin: {{ user['admin'] }}</a>
           </div>
         {% endif %}
       </li>

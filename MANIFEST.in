@@ -1,0 +1,5 @@
+include LICENSE
+graft app/static
+graft app/templates
+graft tests
+global-exclude *.pyc
