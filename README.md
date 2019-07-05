@@ -50,7 +50,6 @@ Running the website:
 # Future enhancements
 
 ### Priority updates
-* Reorganisation of flask app 
 * Configure API to only accept request from this site
 * Persistent data storage for google credentials & Tagging of credentials to one user
 * Snap the page when scrolling
@@ -63,13 +62,14 @@ Running the website:
 * Wall page to allow other users to post 
 
 ### Minor updates
-* Tidy up the code using blueprints
 * Add time stamp to comments
 * Private messaging function
 * Add API token authentication
 * More robust User authentication system
 
 ### Completed updates
+* Tidy up the code using blueprints
+* Reorganisation of flask app 
 * Fix the google API OAuth error (Allow a redirect link to authenticate google account)
 * Separating Blog title and Blog Content
 * Setting a blog post to be seen by: myself, friends or everyone
