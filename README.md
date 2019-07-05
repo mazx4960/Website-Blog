@@ -25,13 +25,17 @@ community that make adding new functionality easy.
 Installing
 ----------
 
-Install and update using `pip`_:
+Installing required packages using `pip`_:
 
-    pip install -U Flask
+    pip install -r requirements.txt
     
-Running the website
+Or, running in virtualenv:
 
     cd <path to the app directory>
+    source env/bin/activate
+    
+Running the website:
+
     export FLASK_APP=blog.py
     flask run
     
@@ -46,7 +50,9 @@ Running the website
 # Future enhancements
 
 ### Priority updates
-* Fix the google API OAuth error (Allow a redirect link to authenticate google account)
+* Reorganisation of flask app 
+* Configure API to only accept request from this site
+* Persistent data storage for google credentials & Tagging of credentials to one user
 * Snap the page when scrolling
 * Create a google calendar event from the website
 * Adding to do list (link to google keep)
@@ -64,6 +70,7 @@ Running the website
 * More robust User authentication system
 
 ### Completed updates
+* Fix the google API OAuth error (Allow a redirect link to authenticate google account)
 * Separating Blog title and Blog Content
 * Setting a blog post to be seen by: myself, friends or everyone
 * Adding google calendar API support to pull data about your daily schedule
